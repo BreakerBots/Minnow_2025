@@ -26,14 +26,6 @@ Sensor utilities and abstractions providing unified interfaces for digital senso
 ### [Utilities](./util/README.md)
 General utilities and helper functions including advanced mathematical operations, comprehensive logging systems, command utilities, factory patterns, and data management tools.
 
-## Key Benefits
-
-- **Enhanced Functionality**: Extends WPILib with advanced features and simplified interfaces
-- **Comprehensive Coverage**: Covers all major aspects of FRC robot development
-- **Modular Design**: Each component can be used independently or together
-- **Well Documented**: Detailed documentation for each component
-- **Active Development**: Regularly updated and maintained
-
 ## Dependencies
 
 BreakerLib integrates with several key FRC libraries:
@@ -43,19 +35,6 @@ BreakerLib integrates with several key FRC libraries:
 - **PathPlanner**: Autonomous path planning
 - **Choreo**: Advanced trajectory following
 - **GTSAM**: SLAM and mapping (optional)
-
-## Getting Started
-
-1. **Choose Your Components**: Review the documentation for each component to understand what you need
-2. **Read Component READMEs**: Each component has detailed documentation with usage examples
-3. **Integration**: Components are designed to work together seamlessly
-4. **Customization**: Extend and customize components as needed for your specific robot
-
-## Version Information
-
-Current version: **2025.1**
-
-For version history and updates, see `util/BreakerLibVersion.java`.
 
 ## Contributing
 
