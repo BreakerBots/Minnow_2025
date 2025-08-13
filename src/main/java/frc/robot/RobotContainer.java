@@ -25,17 +25,16 @@ import frc.robot.subsystems.Roller;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
+
   // The robot's subsystems and commands are defined here...
-  private final Drivetrain drivetrain = new Drivetrain();
   private final BreakerXboxController controller = new BreakerXboxController(Constants.OperatorConstants.kDriverControllerPort);
+  private final Drivetrain drivetrain = new Drivetrain();
   private final Roller roller = new Roller();
-  // Replace with CommandPS4Controller or CommandJoystick if needed
       
   private BreakerInputStream driverX, driverY, driverOmega;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the trigger bindings
     configureBindings();
   }
 
@@ -49,7 +48,11 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+
+      // LEFT BUMPER --> RESET LOCALIZER'S POSE
       controller.getLeftBumper().onTrue(Commands.runOnce(() -> drivetrain.getLocalizer().resetPose(new Pose2d(0,0, Rotation2d.fromRotations(0.5)))));
+
+      // LEFT THUMBSTICK --> DRIVE
       BreakerInputStream2d driverTranslation = controller.getLeftThumbstick();
       driverTranslation = driverTranslation
               .clamp(1.0)
@@ -58,14 +61,14 @@ public class RobotContainer {
               .scale(Constants.DriveConstants.MAXIMUM_TRANSLATIONAL_VELOCITY.in(Units.MetersPerSecond));
       driverX = driverTranslation.getY();
       driverY = driverTranslation.getX();
-  
+
+      // RIGHT THUMBSTICK --> ROTATE
       driverOmega = controller.getRightThumbstick().getX()
               .clamp(1.0)
               .deadband(Constants.OperatorConstants.ROTATIONAL_DEADBAND, 1.0)
               .map(new BreakerLinearizedConstrainedExponential(0.364, 6.6, true))
               .scale(Constants.DriveConstants.MAXIMUM_ROTATIONAL_VELOCITY.in(Units.RadiansPerSecond));
   
-
       drivetrain.setDefaultCommand(drivetrain.getTeleopControlCommand(driverX, driverY, driverOmega, Constants.DriveConstants.TELEOP_CONTROL_CONFIG));
     
   }
@@ -76,7 +79,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
     return null;
   }
 }
