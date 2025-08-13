@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
- * Controllers the motor-driven roller at the end of the robot's arm. 
+ * Controls the motor-driven roller at the end of the robot's arm. 
  * Used to intake/extake game pieces (coral and algae).
  */
 public class Roller extends SubsystemBase {

@@ -39,15 +39,13 @@ import frc.robot.BreakerLib.util.logging.BreakerLog.GitInfo;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean
- * constants. This class should not be used for any other purpose. All constants
- * should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
+ * numerical or boolean constants. 
+ * This class should not be used for any other purpose. 
+ * All constants should be declared globally (i.e. public static). 
+ * Do not put anything functional in this class.
  *
- * <p>
  * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
+ * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
   public static class OperatorConstants {
@@ -85,8 +83,7 @@ public final class Constants {
     public static final LinearVelocity MAXIMUM_TRANSLATIONAL_VELOCITY = Units.MetersPerSecond.of(4.5);
     public static final AngularVelocity MAXIMUM_ROTATIONAL_VELOCITY = Units.RadiansPerSecond.of(9.5);
     // The steer motor uses any SwerveModule.SteerRequestType control request with
-    // the
-    // output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
+    // the output type specified by SwerveModuleConstants.SteerMotorClosedLoopOutput
     private static final Slot0Configs steerGains = new Slot0Configs()
         .withKP(100).withKI(0).withKD(0.2)
         .withKS(0).withKV(1.5).withKA(0);
@@ -182,6 +179,7 @@ public final class Constants {
 
     private static final boolean kInvertLeftSide = false;
     private static final boolean kInvertRightSide = true;
+    
     // Front Left
     private static final int kFrontLeftDriveMotorId = 10;
     private static final int kFrontLeftSteerMotorId = 11;
