@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.controls.DutyCycleOut;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
@@ -15,6 +17,9 @@ import frc.robot.BreakerLib.driverstation.BreakerInputStream;
 import frc.robot.BreakerLib.driverstation.BreakerInputStream2d;
 import frc.robot.BreakerLib.driverstation.gamepad.controllers.BreakerXboxController;
 import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExponential;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import frc.robot.subsystems.*;
 import frc.robot.commands.*;
 
@@ -31,11 +36,21 @@ public class RobotContainer {
   private final Drivetrain drivetrain = new Drivetrain();
   private final ArmExample arm = new ArmExample();
   private final RollerExample roller = new RollerExample();
+  private final TalonFX testArmMotor = new TalonFX(31,"drive_canivore");
+
       
   private BreakerInputStream driverX, driverY, driverOmega;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    com.ctre.phoenix6.configs.TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();  
+    talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+    talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
+    talonFXConfig.CurrentLimits.StatorCurrentLimit = 30.0; // Set the stator current limit to 30
+    testArmMotor.getConfigurator().apply(talonFXConfig); 
+    // Configure the trigger bindings
+    configureBindings();
+
     configureBindings();
   }
 
@@ -102,6 +117,18 @@ public class RobotContainer {
 
       // X BUTTON (press) → explicit stop (useful if a trigger gets stuck or you want a hard stop)
       controller.getButtonX().onTrue(SpinRollerExample.stop(roller));
+
+      DutyCycleOut motorControl = new DutyCycleOut(0.0);
+
+      controller.getDPad().getUp().whileTrue(Commands.run(() ->
+        testArmMotor.setControl(motorControl.withOutput(0.1))));
+      controller.getDPad().getUp().onFalse(Commands.runOnce(() ->
+        testArmMotor.setControl(motorControl.withOutput(0.0))));
+      
+      controller.getDPad().getDown().whileTrue(Commands.run(() ->
+        testArmMotor.setControl(motorControl.withOutput(-0.1))));
+      controller.getDPad().getDown().onFalse(Commands.runOnce(() ->
+        testArmMotor.setControl(motorControl.withOutput(0.0))));
 
     }
 
