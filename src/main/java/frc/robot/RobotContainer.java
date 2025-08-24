@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.controls.DutyCycleOut;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
@@ -20,23 +18,23 @@ import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExpo
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.controls.DutyCycleOut;
 import frc.robot.subsystems.*;
-import frc.robot.commands.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
- * subsystems, commands, and trigger mappings) should be declared here.
+ * subsystems , commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
 
   // The robot's subsystems and commands are defined here...
   private final BreakerXboxController controller = new BreakerXboxController(Constants.OperatorConstants.kDriverControllerPort);
-  private final Drivetrain drivetrain = new Drivetrain();
-  private final ArmExample arm = new ArmExample();
-  private final RollerExample roller = new RollerExample();
+  private final Roller roller = new Roller();
   private final TalonFX testArmMotor = new TalonFX(31,"drive_canivore");
+  // Replace with CommandPS4Controller or CommandJoystick if needed
+  private final Drivetrain drivetrain = new Drivetrain();
 
       
   private BreakerInputStream driverX, driverY, driverOmega;
@@ -49,8 +47,6 @@ public class RobotContainer {
     talonFXConfig.CurrentLimits.StatorCurrentLimit = 30.0; // Set the stator current limit to 30
     testArmMotor.getConfigurator().apply(talonFXConfig); 
     // Configure the trigger bindings
-    configureBindings();
-
     configureBindings();
   }
 
@@ -88,35 +84,7 @@ public class RobotContainer {
               .scale(Constants.DriveConstants.MAXIMUM_ROTATIONAL_VELOCITY.in(Units.RadiansPerSecond));
   
       drivetrain.setDefaultCommand(drivetrain.getTeleopControlCommand(driverX, driverY, driverOmega, Constants.DriveConstants.TELEOP_CONTROL_CONFIG));
-  
-      
-      // ---------------- ARM ----------------
-      
-      // A BUTTON → Arm DOWN (35°) until reached; motor stops in command.end()
-      controller.getButtonA().onTrue(MoveArmToPositionExample.down(arm /*, optionalTimeoutSec */));
-
-      // Y BUTTON → Arm UP (90°) until reached; motor stops in command.end()
-      controller.getButtonY().onTrue(MoveArmToPositionExample.up(arm /*, optionalTimeoutSec */));
-
-      // RIGHT BUMPER → Quick toggle UP/DOWN (uses the simple method on the subsystem)
-      controller.getRightBumper().onTrue(Commands.runOnce(arm::toggle, arm));
-
-      // ---------------- ROLLER ----------------
-
-      // LEFT TRIGGER (hold) → ALGAE_INTAKE; release → stop
-      controller.getLeftTrigger().whileTrue(SpinRollerExample.algaeIntake(roller));
-      controller.getLeftTrigger().onFalse(SpinRollerExample.stop(roller));
-
-      // RIGHT TRIGGER (hold) → ALGAE_EXTAKE; release → stop
-      controller.getRightTrigger().whileTrue(SpinRollerExample.algaeExtake(roller));
-      controller.getRightTrigger().onFalse(SpinRollerExample.stop(roller));
-
-      // B BUTTON (hold) → CORAL_EXTAKE; release → stop
-      controller.getButtonB().whileTrue(SpinRollerExample.coralExtake(roller));
-      controller.getButtonB().onFalse(SpinRollerExample.stop(roller));
-
-      // X BUTTON (press) → explicit stop (useful if a trigger gets stuck or you want a hard stop)
-      controller.getButtonX().onTrue(SpinRollerExample.stop(roller));
+    
 
       DutyCycleOut motorControl = new DutyCycleOut(0.0);
 
@@ -129,6 +97,7 @@ public class RobotContainer {
         testArmMotor.setControl(motorControl.withOutput(-0.1))));
       controller.getDPad().getDown().onFalse(Commands.runOnce(() ->
         testArmMotor.setControl(motorControl.withOutput(0.0))));
+      
 
     }
 
