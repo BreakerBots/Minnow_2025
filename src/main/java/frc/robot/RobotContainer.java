@@ -17,9 +17,13 @@ import frc.robot.BreakerLib.driverstation.gamepad.controllers.BreakerXboxControl
 import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExponential;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
+import com.ctre.phoenix6.controls.PositionDutyCycle;
+
 import frc.robot.subsystems.*;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -34,8 +38,9 @@ public class RobotContainer {
   private final Roller roller = new Roller();
   private final TalonFX testArmMotor = new TalonFX(31,"drive_canivore");
   // Replace with CommandPS4Controller or CommandJoystick if needed
+  
   private final Drivetrain drivetrain = new Drivetrain();
-
+  
       
   private BreakerInputStream driverX, driverY, driverOmega;
 
@@ -45,7 +50,17 @@ public class RobotContainer {
     talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
     talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
     talonFXConfig.CurrentLimits.StatorCurrentLimit = 30.0; // Set the stator current limit to 30
-    testArmMotor.getConfigurator().apply(talonFXConfig); 
+
+    Slot0Configs slot0Configs = talonFXConfig.Slot0;
+    slot0Configs.kP = 0.2;
+    slot0Configs.kI = 0.003;
+    slot0Configs.kD = 0.008;
+    slot0Configs.kS = 0.05;
+
+    testArmMotor.getConfigurator().apply(talonFXConfig);
+    
+    testArmMotor.setPosition(0.0);
+
     // Configure the trigger bindings
     configureBindings();
   }
@@ -87,6 +102,15 @@ public class RobotContainer {
     
 
       DutyCycleOut motorControl = new DutyCycleOut(0.0);
+      PositionDutyCycle positionControl = new PositionDutyCycle(0.0);
+      
+      controller.getButtonY().onTrue(Commands.runOnce(() ->
+        testArmMotor.setControl(positionControl.withPosition(0))));
+      controller.getButtonX().onTrue(Commands.runOnce(() ->
+        testArmMotor.setControl(positionControl.withPosition(-3))));
+      controller.getButtonB().onTrue(Commands.runOnce(() ->
+        testArmMotor.setControl(positionControl.withPosition(3))));
+        
 
       controller.getDPad().getUp().whileTrue(Commands.run(() ->
         testArmMotor.setControl(motorControl.withOutput(0.1))));
