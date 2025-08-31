@@ -16,9 +16,6 @@ import frc.robot.BreakerLib.driverstation.BreakerInputStream2d;
 import frc.robot.BreakerLib.driverstation.gamepad.controllers.BreakerXboxController;
 import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExponential;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.configs.Slot0Configs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 
@@ -46,20 +43,7 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    com.ctre.phoenix6.configs.TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();  
-    talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-    talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-    talonFXConfig.CurrentLimits.StatorCurrentLimit = 30.0; // Set the stator current limit to 30
-
-    Slot0Configs slot0Configs = talonFXConfig.Slot0;
-    slot0Configs.kP = 0.2;
-    slot0Configs.kI = 0.003;
-    slot0Configs.kD = 0.008;
-    slot0Configs.kS = 0.05;
-
-    testArmMotor.getConfigurator().apply(talonFXConfig);
-    
-    testArmMotor.setPosition(0.0);
+   
 
     // Configure the trigger bindings
     configureBindings();
@@ -110,6 +94,8 @@ public class RobotContainer {
         testArmMotor.setControl(positionControl.withPosition(-3))));
       controller.getButtonB().onTrue(Commands.runOnce(() ->
         testArmMotor.setControl(positionControl.withPosition(3))));
+        controller.getButtonA().onTrue(Commands.runOnce(() ->
+        testArmMotor.setControl(positionControl.withPosition(5.75))));
         
 
       controller.getDPad().getUp().whileTrue(Commands.run(() ->
