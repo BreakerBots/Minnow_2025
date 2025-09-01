@@ -33,7 +33,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final BreakerXboxController controller = new BreakerXboxController(Constants.OperatorConstants.kDriverControllerPort);
   private final Roller roller = new Roller();
-  private final TalonFX testArmMotor = new TalonFX(31,"drive_canivore");
+  private final TalonFX testArmMotor = new TalonFX(Constants.ArmConstants.ARM_MOTOR_ID,Constants.GeneralConstants.DRIVE_CANIVORE_BUS);
   // Replace with CommandPS4Controller or CommandJoystick if needed
   
   private final Drivetrain drivetrain = new Drivetrain();
@@ -43,10 +43,9 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-   
 
     // Configure the trigger bindings
-    configureBindings();
+    configureBindings(); // Call the helper method below
   }
 
   /**
@@ -58,6 +57,7 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+
   private void configureBindings() {
 
       // LEFT BUMPER --> RESET LOCALIZER'S POSE
@@ -87,7 +87,10 @@ public class RobotContainer {
 
       DutyCycleOut motorControl = new DutyCycleOut(0.0);
       PositionDutyCycle positionControl = new PositionDutyCycle(0.0);
-      
+
+      // ---------------- ARM ----------------
+
+      // GO TO POSITION
       controller.getButtonY().onTrue(Commands.runOnce(() ->
         testArmMotor.setControl(positionControl.withPosition(0))));
       controller.getButtonX().onTrue(Commands.runOnce(() ->
@@ -95,9 +98,11 @@ public class RobotContainer {
       controller.getButtonB().onTrue(Commands.runOnce(() ->
         testArmMotor.setControl(positionControl.withPosition(3))));
         controller.getButtonA().onTrue(Commands.runOnce(() ->
-        testArmMotor.setControl(positionControl.withPosition(5.75))));
+        testArmMotor.setControl(positionControl.withPosition(5.75))));  // What is this Magic Number!?
+        // Could be moved to Arm subsystem, more abstract aproach.
+        // Should show calculation with gear ratio? (23:1)
         
-
+      // MANUAL VOLTAGE OUTPUT
       controller.getDPad().getUp().whileTrue(Commands.run(() ->
         testArmMotor.setControl(motorControl.withOutput(0.1))));
       controller.getDPad().getUp().onFalse(Commands.runOnce(() ->
@@ -107,7 +112,6 @@ public class RobotContainer {
         testArmMotor.setControl(motorControl.withOutput(-0.1))));
       controller.getDPad().getDown().onFalse(Commands.runOnce(() ->
         testArmMotor.setControl(motorControl.withOutput(0.0))));
-      
 
     }
 

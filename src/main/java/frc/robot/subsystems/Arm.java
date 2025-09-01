@@ -5,25 +5,28 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Arm extends SubsystemBase {
-    private final TalonFX armMotor = new TalonFX(31,"drive_canivore");
+    private final TalonFX armMotor = new TalonFX(Constants.ArmConstants.ARM_MOTOR_ID,Constants.GeneralConstants.DRIVE_CANIVORE_BUS);
     
     public Arm() {
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();  
         talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonFXConfig.CurrentLimits.StatorCurrentLimit = 30.0; // Set the stator current limit to 30
+        talonFXConfig.CurrentLimits.StatorCurrentLimit = Constants.ArmConstants.ARM_CURRENT_LIMIT; 
     
         Slot0Configs slot0Configs = talonFXConfig.Slot0;
-        slot0Configs.kP = 0.2;
-        slot0Configs.kI = 0.003;
-        slot0Configs.kD = 0.008;
-        slot0Configs.kS = 0.05;
+        slot0Configs.kP = Constants.ArmConstants.kP;
+        slot0Configs.kI = Constants.ArmConstants.kI;
+        slot0Configs.kD = Constants.ArmConstants.kD;
+        slot0Configs.kS = Constants.ArmConstants.kS;
+        // Add more?
     
         armMotor.getConfigurator().apply(talonFXConfig);
         
-        armMotor.setPosition(0.0);
+        armMotor.setPosition(0.0);  // Zeroes: arm needs to be physically straight up or code will be off
+        // Needs seperate command, Needs limit switch (beam break) or absolute encoder on arm
     }
     
     public void setArmPosition(double position) {

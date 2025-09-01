@@ -61,6 +61,17 @@ public final class Constants {
         BuildConstants.DIRTY);
   }
 
+  public static class ArmConstants {
+    public static final int ARM_MOTOR_ID = 31; // Arm Motor ID
+    public static final double ARM_CURRENT_LIMIT = 30.0; // Set the stator current limit to 30
+
+     // PhoenixTuner Slot0 values
+    public static final double kP = 0.2;
+    public static final double kI = 0.003;
+    public static final double kD = 0.008;
+    public static final double kS = 0.05;
+  }
+
   public static class AutoConstants {
     public static final PIDConstants TRANSLATION_PID = new PIDConstants(7.5, 0, 0.8);
     public static final PIDConstants ROTATION_PID = new PIDConstants(1.5, 0, 1);
