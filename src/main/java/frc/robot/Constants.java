@@ -62,6 +62,9 @@ public final class Constants {
   }
 
   public static class ArmConstants {
+    public static final double POSITION_LEFT = 3.0;
+    public static final double POSITION_RIGHT = -3.0;
+    public static final double POSITION_UP = 0.0;
     public static final int ARM_MOTOR_ID = 31; // Arm Motor ID
     public static final double ARM_CURRENT_LIMIT = 30.0; // Set the stator current limit to 30
 
