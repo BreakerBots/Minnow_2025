@@ -27,10 +27,9 @@ import frc.robot.subsystems.*;
  * subsystems , commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-
   // The robot's subsystems and commands are defined here...
   private final BreakerXboxController controller = new BreakerXboxController(Constants.OperatorConstants.kDriverControllerPort);
-  private final Roller roller = new Roller();
+  // private final Roller roller = new Roller();
   
   // Replace with CommandPS4Controller or CommandJoystick if needed
   
@@ -56,12 +55,10 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-
       // LEFT BUMPER --> RESET LOCALIZER'S POSE
       controller.getLeftBumper().onTrue(Commands.runOnce(() -> drivetrain.getLocalizer().resetPose(new Pose2d(0,0, Rotation2d.fromRotations(0.5)))));
 
       // ---------------- SWERVE DRIVE ----------------
-
       // LEFT THUMBSTICK --> DRIVE
       BreakerInputStream2d driverTranslation = controller.getLeftThumbstick();
       driverTranslation = driverTranslation
@@ -83,20 +80,17 @@ public class RobotContainer {
 
       // Binds buttons that set certain positions for the arm
       
-      controller.getButtonY().onTrue(Commands.runOnce(() ->
-        arm.setArmPosition(0.0)));
-      controller.getButtonX().onTrue(Commands.runOnce(() ->
-        arm.setArmPosition(-3.0)));
-      controller.getButtonB().onTrue(Commands.runOnce(() ->
-        arm.setArmPosition(3.0)));
+      controller.getButtonY().onTrue(arm.setStateCommand(Arm.State.UP));
+      controller.getButtonX().onTrue(arm.setStateCommand(Arm.State.LEFT));
+      controller.getButtonB().onTrue(arm.setStateCommand(Arm.State.RIGHT));
 
       //Binds 2 buttons to turn the arm clockwise and counterclockwise when pressed
       
-      controller.getDPad().getUp().whileTrue(Commands.run(() ->
+      controller.getDPad().getUp().onTrue(Commands.runOnce(() ->
         arm.setVoltageOutput(0.1)));
       controller.getDPad().getUp().onFalse(Commands.runOnce(() ->
         arm.setVoltageOutput(0.0)));
-      controller.getDPad().getDown().whileTrue(Commands.run(() ->
+      controller.getDPad().getDown().onTrue(Commands.runOnce(() ->
         arm.setVoltageOutput(-0.1)));
       controller.getDPad().getDown().onFalse(Commands.runOnce(() ->
         arm.setVoltageOutput(0.0)));  

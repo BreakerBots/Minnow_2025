@@ -24,6 +24,7 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import com.pathplanner.lib.config.PIDConstants;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -62,14 +63,14 @@ public final class Constants {
   }
 
   public static class ArmConstants {
-    public static final double POSITION_LEFT = 3.0;
-    public static final double POSITION_RIGHT = -3.0;
-    public static final double POSITION_UP = 0.0;
+    public static final Rotation2d POSITION_LEFT = Rotation2d.fromRotations(3); // 3
+    public static final Rotation2d POSITION_RIGHT = Rotation2d.fromRotations(-3); // -3
+    public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); // 0
     public static final int ARM_MOTOR_ID = 31; // Arm Motor ID
     public static final double ARM_CURRENT_LIMIT = 30.0; // Set the stator current limit to 30
 
      // PhoenixTuner Slot0 values
-    public static final double kP = 0.2;
+    public static final double kP = 0.5;
     public static final double kI = 0.003;
     public static final double kD = 0.008;
     public static final double kS = 0.05;
