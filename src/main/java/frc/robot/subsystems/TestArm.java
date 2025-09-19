@@ -12,21 +12,21 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
-public class Arm extends SubsystemBase {
+public class TestArm extends SubsystemBase {
 
     // Driven by a single motor
     private final TalonFX armMotor = new TalonFX(Constants.ArmConstants.ARM_MOTOR_ID, Constants.GeneralConstants.DRIVE_CANIVORE_BUS.getName());
     
-    public State state = State.UP;
+    public State state = State.MIDDLE;
     
     /**
      * Right now, these states equate to arbitrary positions. 
      * Ideally, they'd be based on actual modes for the arm (ie. intake, score, stow, etc.)
      */
     public enum State {
-        
-        DOWN(Constants.ArmConstants.POSITION_DOWN),
-        UP(Constants.ArmConstants.POSITION_UP);
+        LEFT(Constants.ArmConstants.POSITION_LEFT),
+        RIGHT(Constants.ArmConstants.POSITION_RIGHT),
+        MIDDLE(Constants.ArmConstants.POSITION_MIDDLE);
 
         private Rotation2d rotation;
 
@@ -40,7 +40,7 @@ public class Arm extends SubsystemBase {
     }
 
     
-    public Arm() {
+    public TestArm() {
 
         // Configure our arm motor
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();  
