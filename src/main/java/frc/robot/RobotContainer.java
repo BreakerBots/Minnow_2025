@@ -30,6 +30,7 @@ public class RobotContainer {
     private final BreakerXboxController controller = new BreakerXboxController(Constants.OperatorConstants.kDriverControllerPort);
     private final Drivetrain drivetrain = new Drivetrain();
     private final Arm arm = new Arm();
+    private final Roller roller = new Roller();
         
     private BreakerInputStream driverX, driverY, driverOmega;
 
@@ -80,8 +81,8 @@ public class RobotContainer {
         // controller.getButtonX().onTrue(arm.setStateCommand(Arm.State.LEFT));
         // controller.getButtonB().onTrue(arm.setStateCommand(Arm.State.RIGHT));
 
-        controller.getButtonY().onTrue(arm.setStateCommand(Arm.State.UP));
-        controller.getButtonA().onTrue(arm.setStateCommand(Arm.State.DOWN));
+        controller.getDPad().getUp().onTrue(arm.setStateCommand(Arm.State.UP));
+        controller.getDPad().getDown().onTrue(arm.setStateCommand(Arm.State.DOWN));
 
         //D-PAD UP/DOWN --> Manually move the arm clockwise and counterclockwise
         // controller.getDPad().getUp().onTrue(Commands.runOnce(() -> arm.setVoltageOutput(0.1)));
@@ -91,8 +92,35 @@ public class RobotContainer {
 
         // ---------------- ROLLER ----------------
 
-        // Coming Soon...
+        controller.getDPad().getLeft().whileTrue(roller.setSpeedCommand(Constants.RollerConstants.ALGAE_INTAKE_SPEED));
+        controller.getDPad().getRight().whileTrue(roller.setSpeedCommand(Constants.RollerConstants.ALGAE_EXTAKE_SPEED));
 
+        // ---------------- STATES ----------------
+
+        controller.getButtonX().onTrue(
+            Commands.sequence(
+                arm.setStateCommand(Arm.State.UP),
+                roller.setStateCommand(Roller.State.IDLE)
+            )
+        );
+        controller.getButtonY().onTrue(
+            Commands.sequence(
+                arm.setStateCommand(Arm.State.UP),
+                roller.setStateCommand(Roller.State.CORAL_EXTAKE)
+            )
+        );
+        controller.getButtonA().onTrue(
+            Commands.sequence(
+                arm.setStateCommand(Arm.State.DOWN),
+                roller.setStateCommand(Roller.State.ALGAE_INTAKE)
+            )
+        );
+        controller.getButtonB().onTrue(
+            Commands.sequence(
+                arm.setStateCommand(Arm.State.UP),
+                roller.setStateCommand(Roller.State.ALGAE_EXTAKE)
+            )
+        );
     }
 
 

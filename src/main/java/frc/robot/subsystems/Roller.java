@@ -1,12 +1,9 @@
 package frc.robot.subsystems;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
-import com.ctre.phoenix6.controls.PositionDutyCycle;
 
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,28 +45,28 @@ public class Roller extends SubsystemBase {
     return Commands.runOnce(() -> setState(newState));
   }
 
+  public void setSpeed(double speed) {
+    rollerMotor.setControl(new DutyCycleOut(state.getSpeed()));
+  }
+
+  public Command setSpeedCommand(double speed) {
+    return Commands.runOnce(() -> setSpeed(speed));
+  }
+
   public Roller() {
       // Configure our arm motor
       TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();  
       talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
       talonFXConfig.CurrentLimits.StatorCurrentLimit = Constants.RollerConstants.ROLLER_CURRENT_LIMIT;
-  
-      Slot0Configs slot0Configs = talonFXConfig.Slot0;
-      slot0Configs.kP = Constants.ArmConstants.kP;
-      slot0Configs.kI = Constants.ArmConstants.kI;
-      slot0Configs.kD = Constants.ArmConstants.kD;
-      slot0Configs.kS = Constants.ArmConstants.kS;
 
       rollerMotor.getConfigurator().apply(talonFXConfig);
-      
-      // Zeroes: arm needs to be physically straight up or code will be off
-      // Needs seperate command, Needs limit switch (beam break) or absolute encoder on arm?
-      rollerMotor.setPosition(0.0); 
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    rollerMotor.setControl(new DutyCycleOut(state.getSpeed()));
+
   } 
 }
