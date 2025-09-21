@@ -15,7 +15,7 @@ import frc.robot.BreakerLib.driverstation.BreakerInputStream;
 import frc.robot.BreakerLib.driverstation.BreakerInputStream2d;
 import frc.robot.BreakerLib.driverstation.gamepad.controllers.BreakerXboxController;
 import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExponential;
-
+import frc.robot.commands.Autos;
 import frc.robot.subsystems.*;
 
 /**
@@ -125,6 +125,6 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return null;
+        return Autos.moveForward(drivetrain);
     }
 }

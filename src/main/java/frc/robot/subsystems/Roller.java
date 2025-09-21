@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
 
 
 /**
@@ -17,6 +18,8 @@ import frc.robot.Constants;
 public class Roller extends SubsystemBase {
 
   private final TalonFX rollerMotor = new TalonFX(Constants.RollerConstants.ROLLER_MOTOR_ID, Constants.GeneralConstants.DRIVE_CANIVORE_BUS.getName());
+  // private final BreakerDigitalSensor beamBreak = null; // TODO
+  // also gonna need a CANdi (probably)
 
   public State state = State.IDLE;
 
@@ -39,6 +42,7 @@ public class Roller extends SubsystemBase {
 
   public void setState(State newState) {
     state = newState;
+    setSpeed(state.getSpeed());
   }
 
   public Command setStateCommand(State newState) {
@@ -54,7 +58,8 @@ public class Roller extends SubsystemBase {
   }
 
   public Roller() {
-      // Configure our arm motor
+    
+    // Configure our roller+ motor
       TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();  
       talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
       talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
@@ -66,7 +71,8 @@ public class Roller extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    rollerMotor.setControl(new DutyCycleOut(state.getSpeed()));
-
+    // if (beamBreak.getAsBoolean()) {
+    //   // do whatever
+    // }
   } 
 }
