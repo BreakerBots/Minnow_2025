@@ -17,7 +17,7 @@ public class Arm extends SubsystemBase {
 
     // Driven by a single motor
     private final TalonFX armMotor = new TalonFX(Constants.ArmConstants.ARM_MOTOR_ID,
-            Constants.GeneralConstants.DRIVE_CANIVORE_BUS.getName());
+            Constants.GeneralConstants.SUPERSTRUCTURE_CANIVORE_BUS.getName());
 
     public State state = State.UP;
 

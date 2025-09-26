@@ -53,7 +53,8 @@ public final class Constants {
     // ---------------- GENERAL ----------------
 
     public static class GeneralConstants {
-        public static final CANBus DRIVE_CANIVORE_BUS = new CANBus("drive_canivore");
+        public static final CANBus DRIVE_CANIVORE_BUS = new CANBus("rio");
+        public static final CANBus SUPERSTRUCTURE_CANIVORE_BUS = new CANBus("superstructure");
         public static final GitInfo GIT_INFO = new GitInfo(BuildConstants.MAVEN_NAME, BuildConstants.GIT_REVISION,
             BuildConstants.GIT_SHA, BuildConstants.GIT_DATE, BuildConstants.GIT_BRANCH, BuildConstants.BUILD_DATE,
             BuildConstants.DIRTY);
@@ -73,7 +74,7 @@ public final class Constants {
         public static final Rotation2d POSITION_MIDDLE = Rotation2d.fromRotations(0); 
         public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); 
         public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-3); 
-        public static final int ARM_MOTOR_ID = 31; 
+        public static final int ARM_MOTOR_ID = 43; 
         public static final double ARM_CURRENT_LIMIT = 30.0;
 
         // PhoenixTuner Slot0 values
@@ -86,7 +87,7 @@ public final class Constants {
 
     // ---------------- ROLLER ----------------
     public static class RollerConstants {
-        public static final int ROLLER_MOTOR_ID = 30; 
+        public static final int ROLLER_MOTOR_ID = 60; 
         public static final double CORAL_EXTAKE_SPEED = -0.5; // -0.5
         public static final double ALGAE_EXTAKE_SPEED = -0.3; // -0.3
         public static final double ALGAE_INTAKE_SPEED = 0.4; // 0.4
@@ -216,8 +217,8 @@ public final class Constants {
         private static final boolean kFrontLeftSteerInvert = true;
         private static final boolean kFrontLeftEncoderInvert = false;
         private static final Translation2d kFrontLeftModulePosition = new Translation2d(
-            Units.Inches.of(9.84),
-            Units.Inches.of(9.84));
+            Units.Inches.of(11.25),
+            Units.Inches.of(11.25 ));
 
         // Front Right
         private static final int kFrontRightDriveMotorId = 12;
@@ -228,8 +229,8 @@ public final class Constants {
         private static final boolean kFrontRightEncoderInvert = false;
 
         private static final Translation2d kFrontRightModulePosition = new Translation2d(
-            Units.Inches.of(9.84),
-            Units.Inches.of(-9.84));
+            Units.Inches.of(11.25),
+            Units.Inches.of(-11.25));
 
         // Back Left
         private static final int kBackLeftDriveMotorId = 14;
@@ -240,8 +241,8 @@ public final class Constants {
         private static final boolean kBackLeftEncoderInvert = false;
 
         private static final Translation2d kBackLeftModulePosition = new Translation2d(
-            Units.Inches.of(-9.84),
-            Units.Inches.of(9.84));
+            Units.Inches.of(-11.25),
+            Units.Inches.of(11.25));
 
         // Back Right
         private static final int kBackRightDriveMotorId = 16;
@@ -251,8 +252,8 @@ public final class Constants {
         private static final boolean kBackRightSteerInvert = true;
         private static final boolean kBackRightEncoderInvert = false;
         private static final Translation2d kBackRightModulePosition = new Translation2d(
-            Units.Inches.of(-9.84),
-            Units.Inches.of(-9.84));
+            Units.Inches.of(-11.25),
+            Units.Inches.of(-11.25));
 
         public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft = ConstantCreator
             .createModuleConstants(

@@ -4,6 +4,7 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -17,11 +18,14 @@ import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
  */
 public class Roller extends SubsystemBase {
 
-  private final TalonFX rollerMotor = new TalonFX(Constants.RollerConstants.ROLLER_MOTOR_ID, Constants.GeneralConstants.DRIVE_CANIVORE_BUS.getName());
-  // private final BreakerDigitalSensor beamBreak = null; // TODO
+  private final TalonFX rollerMotor = new TalonFX(Constants.RollerConstants.ROLLER_MOTOR_ID, Constants.GeneralConstants.SUPERSTRUCTURE_CANIVORE_BUS.getName());
+  // private final BreakerDigitalSensor beamBreak;
+  
+  
   // also gonna need a CANdi (probably)
 
   public State state = State.IDLE;
+
 
   public enum State {
     CORAL_EXTAKE(Constants.RollerConstants.CORAL_EXTAKE_SPEED),
@@ -68,11 +72,14 @@ public class Roller extends SubsystemBase {
       rollerMotor.getConfigurator().apply(talonFXConfig);
   }
 
+  public boolean hasAlgae = false;
+
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
     // if (beamBreak.getAsBoolean()) {
-    //   // do whatever
+    //   hasAlgae = true;
+    //   setStateCommand(Roller.State.IDLE);
     // }
   } 
 }
