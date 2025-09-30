@@ -54,7 +54,7 @@ public class Roller extends SubsystemBase {
   }
 
   public void setSpeed(double speed) {
-    rollerMotor.setControl(new DutyCycleOut(state.getSpeed()));
+    rollerMotor.setControl(new DutyCycleOut(speed));
   }
 
   public Command setSpeedCommand(double speed) {

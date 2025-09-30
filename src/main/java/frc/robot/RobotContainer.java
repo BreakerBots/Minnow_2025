@@ -85,10 +85,10 @@ public class RobotContainer {
         controller.getDPad().getDown().onTrue(arm.setStateCommand(Arm.State.DOWN));
 
         //D-PAD UP/DOWN --> Manually move the arm clockwise and counterclockwise
-        // controller.getDPad().getUp().onTrue(Commands.runOnce(() -> arm.setVoltageOutput(0.1)));
-        // controller.getDPad().getUp().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));
-        // controller.getDPad().getDown().onTrue(Commands.runOnce(() -> arm.setVoltageOutput(-0.1)));
-        // controller.getDPad().getDown().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));  
+         controller.getDPad().getUp().onTrue(Commands.runOnce(() -> arm.setVoltageOutput(0.1)));
+         controller.getDPad().getUp().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));
+         controller.getDPad().getDown().onTrue(Commands.runOnce(() -> arm.setVoltageOutput(-0.1)));
+         controller.getDPad().getDown().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));  
 
         // ---------------- ROLLER ----------------
 

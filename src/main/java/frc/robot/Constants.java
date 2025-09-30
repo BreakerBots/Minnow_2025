@@ -73,15 +73,15 @@ public final class Constants {
         public static final Rotation2d POSITION_RIGHT = Rotation2d.fromRotations(-3); 
         public static final Rotation2d POSITION_MIDDLE = Rotation2d.fromRotations(0); 
         public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); 
-        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-3); 
+        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-8.2); 
         public static final int ARM_MOTOR_ID = 43; 
         public static final double ARM_CURRENT_LIMIT = 30.0;
 
         // PhoenixTuner Slot0 values
-        public static final double kP = 0.5;
+        public static final double kP = 0.04;
         public static final double kI = 0.003;
-        public static final double kD = 0.008;
-        public static final double kS = 0.05;
+        public static final double kD = 0.000;
+        public static final double kS = 0.1;
     }
 
 
@@ -212,8 +212,8 @@ public final class Constants {
         // Front Left
         private static final int kFrontLeftDriveMotorId = 10;
         private static final int kFrontLeftSteerMotorId = 11;
-        private static final int kFrontLeftEncoderId = 20;
-        private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.186279296875);
+        private static final int kFrontLeftEncoderId = 50;
+        private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.204345703125);
         private static final boolean kFrontLeftSteerInvert = true;
         private static final boolean kFrontLeftEncoderInvert = false;
         private static final Translation2d kFrontLeftModulePosition = new Translation2d(
@@ -224,7 +224,7 @@ public final class Constants {
         private static final int kFrontRightDriveMotorId = 12;
         private static final int kFrontRightSteerMotorId = 13;
         private static final int kFrontRightEncoderId = 21;
-        private static final Angle kFrontRightEncoderOffset = Rotations.of(-0.09716796875);
+        private static final Angle kFrontRightEncoderOffset = Rotations.of(0.171142578125 + 0.5);
         private static final boolean kFrontRightSteerInvert = true;
         private static final boolean kFrontRightEncoderInvert = false;
 
@@ -236,7 +236,7 @@ public final class Constants {
         private static final int kBackLeftDriveMotorId = 14;
         private static final int kBackLeftSteerMotorId = 15;
         private static final int kBackLeftEncoderId = 22;
-        private static final Angle kBackLeftEncoderOffset = Rotation.of(0.3154296875);
+        private static final Angle kBackLeftEncoderOffset = Rotation.of(0.12451171875);
         private static final boolean kBackLeftSteerInvert = true;
         private static final boolean kBackLeftEncoderInvert = false;
 
@@ -248,7 +248,7 @@ public final class Constants {
         private static final int kBackRightDriveMotorId = 16;
         private static final int kBackRightSteerMotorId = 17;
         private static final int kBackRightEncoderId = 23;
-        private static final Angle kBackRightEncoderOffset = Rotations.of(-0.302978515625);
+        private static final Angle kBackRightEncoderOffset = Rotations.of(0.00830078125 + 0.5);
         private static final boolean kBackRightSteerInvert = true;
         private static final boolean kBackRightEncoderInvert = false;
         private static final Translation2d kBackRightModulePosition = new Translation2d(
