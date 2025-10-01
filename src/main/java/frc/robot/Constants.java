@@ -73,10 +73,12 @@ public final class Constants {
         public static final Rotation2d POSITION_RIGHT = Rotation2d.fromRotations(-3); 
         public static final Rotation2d POSITION_MIDDLE = Rotation2d.fromRotations(0); 
         public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); 
+        public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(0);
         public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-8.2); 
         public static final int ARM_MOTOR_ID = 43; 
-        public static final double ARM_CURRENT_LIMIT = 30.0;
-
+        public static final double ARM_CURRENT_LIMIT = 60.0;
+        public static final int BEAM_BREAK_DIO_PORT = 0;
+       
         // PhoenixTuner Slot0 values
         public static final double kP = 0.04;
         public static final double kI = 0.003;
@@ -87,12 +89,13 @@ public final class Constants {
 
     // ---------------- ROLLER ----------------
     public static class RollerConstants {
-        public static final int ROLLER_MOTOR_ID = 60; 
-        public static final double CORAL_EXTAKE_SPEED = -0.5; // -0.5
+        public static final int ROLLER_MOTOR_ID = 24; 
+        public static final double CORAL_EXTAKE_SPEED = 0.5; // -0.5
         public static final double ALGAE_EXTAKE_SPEED = -0.3; // -0.3
         public static final double ALGAE_INTAKE_SPEED = 0.4; // 0.4
         public static final double IDLE_SPEED = 0.0;
-        public static final double ROLLER_CURRENT_LIMIT = 0;
+        public static final double ROLLER_CURRENT_LIMIT = 60;
+        public static final double ALGAE_STOW_SPEED = 0.0;
     }   
 
     // ---------------- SWERVE DRIVE ----------------

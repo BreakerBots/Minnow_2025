@@ -6,6 +6,8 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
+import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +20,10 @@ public class Arm extends SubsystemBase {
     // Driven by a single motor
     private final TalonFX armMotor = new TalonFX(Constants.ArmConstants.ARM_MOTOR_ID,
             Constants.GeneralConstants.SUPERSTRUCTURE_CANIVORE_BUS.getName());
+    private Roller roller;
+
+    private final BreakerDigitalSensor beamBreak = BreakerDigitalSensor.fromDIO(Constants.ArmConstants.BEAM_BREAK_DIO_PORT, true);
+    
 
     public State state = State.UP;
 
@@ -29,7 +35,8 @@ public class Arm extends SubsystemBase {
     public enum State {
 
         DOWN(Constants.ArmConstants.POSITION_DOWN),
-        UP(Constants.ArmConstants.POSITION_UP);
+        UP(Constants.ArmConstants.POSITION_UP),
+        STOW(Constants.ArmConstants.POSITION_STOW);
 
         private Rotation2d rotation;
 
@@ -62,6 +69,11 @@ public class Arm extends SubsystemBase {
         // Needs seperate command, Needs limit switch (beam break) or absolute encoder
         // on arm?
         armMotor.setPosition(0.0);
+        
+    }
+
+    public void setRoller(Roller roller) {
+        this.roller = roller;
     }
 
     public void setState(State newState) {
@@ -80,4 +92,15 @@ public class Arm extends SubsystemBase {
     public void setVoltageOutput(double output) {
         armMotor.setControl(new DutyCycleOut(output));
     }
+
+
+
+    @Override
+  public void periodic() {
+   
+    //  if(state == State.DOWN && beamBreak.isTriggered()) {
+    //     roller.setState(Roller.State.ALGAE_STOW);
+    //     setState(State.STOW); 
+    //  }  
+  } 
 }

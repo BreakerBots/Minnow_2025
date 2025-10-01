@@ -31,7 +31,9 @@ public class Roller extends SubsystemBase {
     CORAL_EXTAKE(Constants.RollerConstants.CORAL_EXTAKE_SPEED),
     ALGAE_EXTAKE(Constants.RollerConstants.ALGAE_EXTAKE_SPEED),
     ALGAE_INTAKE(Constants.RollerConstants.ALGAE_INTAKE_SPEED),
+    ALGAE_STOW(Constants.RollerConstants.ALGAE_STOW_SPEED),
     IDLE(Constants.RollerConstants.IDLE_SPEED);
+    
 
     private double speed;
 
