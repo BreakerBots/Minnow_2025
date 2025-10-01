@@ -4,13 +4,10 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
-
 
 /**
  * Controls the motor-driven roller at the end of the robot's arm. 
@@ -19,10 +16,6 @@ import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
 public class Roller extends SubsystemBase {
 
   private final TalonFX rollerMotor = new TalonFX(Constants.RollerConstants.ROLLER_MOTOR_ID, Constants.GeneralConstants.SUPERSTRUCTURE_CANIVORE_BUS.getName());
-  // private final BreakerDigitalSensor beamBreak;
-  
-  
-  // also gonna need a CANdi (probably)
 
   public State state = State.IDLE;
 
@@ -33,7 +26,6 @@ public class Roller extends SubsystemBase {
     ALGAE_INTAKE(Constants.RollerConstants.ALGAE_INTAKE_SPEED),
     ALGAE_STOW(Constants.RollerConstants.ALGAE_STOW_SPEED),
     IDLE(Constants.RollerConstants.IDLE_SPEED);
-    
 
     private double speed;
 
@@ -79,9 +71,5 @@ public class Roller extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    // if (beamBreak.getAsBoolean()) {
-    //   hasAlgae = true;
-    //   setStateCommand(Roller.State.IDLE);
-    // }
   } 
 }
