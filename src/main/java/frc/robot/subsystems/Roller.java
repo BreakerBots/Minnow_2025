@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.BreakerLib.util.logging.BreakerLog;
 import frc.robot.Constants;
 
 /**
@@ -39,8 +40,14 @@ public class Roller extends SubsystemBase {
   }
 
   public void setState(State newState) {
+    State previousState = state;
     state = newState;
     setSpeed(state.getSpeed());
+    
+    // Log state change
+    BreakerLog.log("Roller/State/Previous", previousState.toString());
+    BreakerLog.log("Roller/State/Current", state.toString());
+    BreakerLog.log("Roller/State/Speed", state.getSpeed());
   }
 
   public Command setStateCommand(State newState) {
@@ -66,10 +73,7 @@ public class Roller extends SubsystemBase {
       rollerMotor.getConfigurator().apply(talonFXConfig);
   }
 
-  public boolean hasAlgae = false;
-
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
   } 
 }

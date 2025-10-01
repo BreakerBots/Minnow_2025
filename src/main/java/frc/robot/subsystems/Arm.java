@@ -7,7 +7,7 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
-import edu.wpi.first.wpilibj.DigitalInput;
+import frc.robot.BreakerLib.util.logging.BreakerLog;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -77,8 +77,14 @@ public class Arm extends SubsystemBase {
     }
 
     public void setState(State newState) {
+        State previousState = state;
         state = newState;
         setArmPosition(state.getRotation2d().getRotations());
+        
+        // Log state change
+        BreakerLog.log("Arm/State/Previous", previousState.toString());
+        BreakerLog.log("Arm/State/Current", state.toString());
+        BreakerLog.log("Arm/State/Position", state.getRotation2d().getRotations());
     }
 
     public Command setStateCommand(State newState) {
@@ -97,10 +103,11 @@ public class Arm extends SubsystemBase {
 
     @Override
   public void periodic() {
-   
-    //  if(state == State.DOWN && beamBreak.isTriggered()) {
-    //     roller.setState(Roller.State.ALGAE_STOW);
-    //     setState(State.STOW); 
-    //  }  
-  } 
+
+   if (state == State.DOWN && beamBreak.isTriggered()) {
+        BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
+        //roller.setState(Roller.State.ALGAE_STOW);
+        //setState(State.STOW); 
+   }
+ } 
 }
