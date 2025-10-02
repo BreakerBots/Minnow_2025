@@ -73,7 +73,7 @@ public final class Constants {
         public static final Rotation2d POSITION_RIGHT = Rotation2d.fromRotations(-3); 
         public static final Rotation2d POSITION_MIDDLE = Rotation2d.fromRotations(0); 
         public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); // 0
-        public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(0);
+        public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(-1.75);
         public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-8.5); 
         public static final int ARM_MOTOR_ID = 43; 
         public static final double ARM_CURRENT_LIMIT = 60.0;
@@ -84,13 +84,14 @@ public final class Constants {
         public static final double kI = 0.003;
         public static final double kD = 0.002;
         public static final double kS = 0.1;
+        public static final double kG = 0.5;
     }
 
 
     // ---------------- ROLLER ----------------
     public static class RollerConstants {
         public static final int ROLLER_MOTOR_ID = 24; 
-        public static final double CORAL_EXTAKE_SPEED = 0.2; // -0.5
+        public static final double CORAL_EXTAKE_SPEED = 0.15; // -0.5
         public static final double ALGAE_EXTAKE_SPEED = -0.3; // -0.3
         public static final double ALGAE_INTAKE_SPEED = 0.4; // 0.4
         public static final double IDLE_SPEED = 0.0;
