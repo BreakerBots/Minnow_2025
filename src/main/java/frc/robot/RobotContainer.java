@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
@@ -16,6 +15,7 @@ import frc.robot.BreakerLib.driverstation.BreakerInputStream;
 import frc.robot.BreakerLib.driverstation.BreakerInputStream2d;
 import frc.robot.BreakerLib.driverstation.gamepad.controllers.BreakerXboxController;
 import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExponential;
+import frc.robot.BreakerLib.util.logging.BreakerLog;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.*;
 
@@ -37,6 +37,10 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
+        // Disable verbose logging to reduce noise
+        // Flip this back on when debugging/troubleshooting
+        BreakerLog.setVerboseLogging(false);
+
         arm.setRoller(roller);
         configureBindings();
     }
@@ -79,24 +83,18 @@ public class RobotContainer {
 
         // ---------------- ARM ----------------
 
-        // X, Y, B --> Move to set positions
-        // controller.getButtonY().onTrue(arm.setStateCommand(Arm.State.UP));
-        // controller.getButtonX().onTrue(arm.setStateCommand(Arm.State.LEFT));
-        // controller.getButtonB().onTrue(arm.setStateCommand(Arm.State.RIGHT));
+        //D-PAD UP/DOWN --> Manually move arm
+        controller.getDPad().getUp().whileTrue(Commands.runOnce(() -> arm.setVoltageOutput(0.1)));
+        controller.getDPad().getUp().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));
+        controller.getDPad().getDown().whileTrue(Commands.runOnce(() -> arm.setVoltageOutput(-0.1)));
+        controller.getDPad().getDown().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));
 
-        // controller.getDPad().getUp().onTrue(arm.setStateCommand(Arm.State.UP));
-        // controller.getDPad().getDown().onTrue(arm.setStateCommand(Arm.State.DOWN));
-
-        //D-PAD UP/DOWN --> Manually move the arm clockwise and counterclockwise
-         controller.getDPad().getUp().whileTrue(Commands.runOnce(() -> arm.setVoltageOutput(0.1)));
-         controller.getDPad().getUp().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));
-         controller.getDPad().getDown().whileTrue(Commands.runOnce(() -> arm.setVoltageOutput(-0.1)));
-         controller.getDPad().getDown().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));
-
-         controller.getRightBumper().onTrue(Commands.runOnce(() -> arm.homePosition()));
+        //RIGHT BUMPER --> Set current position as home position
+        controller.getRightBumper().onTrue(Commands.runOnce(() -> arm.homePosition()));
 
         // ---------------- ROLLER ----------------
 
+        //TRIGGERS --> Manually spin rollers
         controller.getLeftTrigger().whileTrue(roller.setSpeedCommand(Constants.RollerConstants.ALGAE_INTAKE_SPEED));
         controller.getLeftTrigger().onFalse(roller.setSpeedCommand(Constants.RollerConstants.IDLE_SPEED));
         controller.getRightTrigger().whileTrue(roller.setSpeedCommand(Constants.RollerConstants.ALGAE_EXTAKE_SPEED));
@@ -104,24 +102,31 @@ public class RobotContainer {
 
         // ---------------- STATES ----------------
 
+        //CORAL INTAKE
         controller.getButtonX().onTrue(
             Commands.sequence(
                 arm.setStateCommand(Arm.State.UP),
                 roller.setStateCommand(Roller.State.IDLE)
             )
         );
+
+        //CORAL EXTAKE
         controller.getButtonY().onTrue(
             Commands.sequence(
                 arm.setStateCommand(Arm.State.UP),
                 roller.setStateCommand(Roller.State.CORAL_EXTAKE)
             )
         );
+
+        //ALGAE INTAKE
         controller.getButtonA().onTrue(
             Commands.sequence(
                 arm.setStateCommand(Arm.State.DOWN),
                 roller.setStateCommand(Roller.State.ALGAE_INTAKE)
             )
         );
+
+        //ALGAE EXTAKE
         controller.getButtonB().onTrue(
             Commands.sequence(
                 arm.setStateCommand(Arm.State.UP),

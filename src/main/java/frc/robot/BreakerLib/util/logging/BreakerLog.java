@@ -9,19 +9,14 @@ import java.util.ArrayList;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.CANBus.CANBusStatus;
 import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.CANdi;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.hardware.TalonFXS;
 import com.ctre.phoenix6.swerve.SwerveModule;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 
 import choreo.trajectory.SwerveSample;
 import choreo.trajectory.Trajectory;
-import choreo.trajectory.TrajectorySample;
 import dev.doglog.DogLog;
-import dev.doglog.DogLogOptions;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -29,19 +24,11 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Measure;
-import edu.wpi.first.units.Unit;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.CAN;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.PowerDistribution;
-import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.util.WPILibVersion;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.BuildConstants;
 import frc.robot.BreakerLib.physics.BreakerVector2;
 import frc.robot.BreakerLib.physics.BreakerVector3;
@@ -49,10 +36,30 @@ import frc.robot.BreakerLib.physics.ChassisAccels;
 import frc.robot.BreakerLib.util.BreakerLibVersion;
 
 
-/** Add your docs here. */
+/**
+* BreakerLog provides comprehensive logging for FRC robots with real-time dashboard support.
+*
+* This class extends DogLog to add FRC-specific logging capabilities:
+*
+* LOGGING DESTINATIONS:
+* - Files: All logs are written to files via DogLog (always enabled)
+* - NetworkTables: Real-time logs published to dashboards (filtered by FMS status)
+*
+* FMS FILTERING:
+* - During matches (FMS connected): NetworkTables publishing disabled to conserve bandwidth
+* - During practice (FMS not connected): NetworkTables publishing enabled for real-time monitoring
+*
+* VERBOSE LOGGING CONTROL:
+* - Use setVerboseLogging(true/false) to control high-frequency logging
+* - When false: Reduces noise from frequent telemetry (joysticks, sensors, etc.)
+* - When true: Enables detailed debugging information
+* - Default: false (set in RobotContainer based on match status)
+*/
 public class BreakerLog extends DogLog implements Subsystem {
     private static ArrayList<CANBus> loggedCANBuses = new ArrayList<>();
-    private static final BreakerLog instance = new BreakerLog();
+
+    /** Global verbose logging control - when false, high-frequency logging is disabled */
+    private static boolean verboseLogging = true;
 
     private BreakerLog() {
         CommandScheduler.getInstance().registerSubsystem(this);
@@ -62,6 +69,23 @@ public class BreakerLog extends DogLog implements Subsystem {
     public void periodic() {
         BreakerLog.periodicLog();
     }
+
+
+    /**
+     * Log levels for different types of messages, allows for filtering in dashboards
+     */
+    public enum LogLevel {
+        DEBUG, // Granular details most useful when troubleshooting
+        INFO, // Important details
+        WARNING, // Not an error, but should be noted
+        ERROR // Something went wrong
+    }
+    
+    /* We usually want to log a message with a level */
+    public static void log(LogLevel level, String key, String message) {
+        log(level.name() + "/" + key, message);
+    }
+
 
     public static void log(String key, Measure<?> value) {
         log(key + "/Value", value.magnitude());
@@ -184,7 +208,8 @@ public class BreakerLog extends DogLog implements Subsystem {
     }
 
     private static void periodicLog() {
-        if (options.logExtras()) {
+        // Only log CAN buses if both DogLog extras are enabled AND our verbose flag is true
+        if (options.logExtras() && verboseLogging) {
             logCANBuses();
         }
     }
@@ -208,7 +233,6 @@ public class BreakerLog extends DogLog implements Subsystem {
         logMetadata("Dirty", Integer.toString(metadata.dirty));
     }
 
-
     public record Metadata(
         String robotName,
         int year,
@@ -231,25 +255,37 @@ public class BreakerLog extends DogLog implements Subsystem {
         ) {
             this(robotName, year, authors, WPILibVersion.Version, BreakerLibVersion.version, BuildConstants.MAVEN_NAME, gitInfo.gitRevision, gitInfo.gitSHA, gitInfo.gitDate, gitInfo.gitBranch, gitInfo.buildDate, gitInfo.dirty);
         }
-
-        
     }
 
-    public record GitInfo (
-            String mavenName,
-            int gitRevision,
-            String gitSHA,
-            String gitDate,
-            String gitBranch,
-            String buildDate,
-            int dirty
-        ) {
-        }
+    public record GitInfo (String mavenName,
+                           int gitRevision,
+                           String gitSHA,
+                           String gitDate,
+                           String gitBranch,
+                           String buildDate,
+                           int dirty) {
+    }
 
     public static void updateDynamicPublishNT() {
         boolean shouldPub = DriverStation.isDSAttached() && !DriverStation.isFMSAttached();
         setOptions(options.withNtPublish(shouldPub));
     }
 
-   
+
+    public static void setVerboseLogging(boolean verbose) {
+        verboseLogging = verbose;
+        
+        // Configure DogLog options based on verbose setting
+        if (verbose) {
+            // Enable all logging features when verbose
+            setOptions(options.withLogExtras(true));
+        } else {
+            // Disable extra logging features when not verbose
+            setOptions(options.withLogExtras(false));
+        }
+    }
+    
+    public static boolean isVerboseLogging() {
+        return verboseLogging;
+    }
 }

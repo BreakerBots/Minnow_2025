@@ -125,14 +125,16 @@ public class BreakerSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, 
     chassisAccels = ChassisAccels.fromDeltaSpeeds(prevChassisSpeeds, state.Speeds, state.OdometryPeriod);
     prevChassisSpeeds = state.Speeds;
     
-    BreakerLog.log("SwerveDrivetrain/State/Movement/Pose", state.Pose);
-    BreakerLog.log("SwerveDrivetrain/State/Movement/Speeds", state.Speeds);
-    BreakerLog.log("SwerveDrivetrain/State/Movement/Accels", chassisAccels);
-    BreakerLog.log("SwerveDrivetrain/State/ModuleStates/RealModuleStates", state.ModuleStates);
-    BreakerLog.log("SwerveDrivetrain/State/ModuleStates/TargetModuleStates", state.ModuleTargets);
-    BreakerLog.log("SwerveDrivetrain/State/Odometry/SuccessfulDAQs", state.SuccessfulDaqs);
-    BreakerLog.log("SwerveDrivetrain/State/Odometry/FailedDAQs", state.FailedDaqs);
-    BreakerLog.log("SwerveDrivetrain/State/Odometry/OdometryPeriod", state.OdometryPeriod);
+    if (BreakerLog.isVerboseLogging()) {
+      BreakerLog.log("SwerveDrivetrain/State/Movement/Pose", state.Pose);
+      BreakerLog.log("SwerveDrivetrain/State/Movement/Speeds", state.Speeds);
+      BreakerLog.log("SwerveDrivetrain/State/Movement/Accels", chassisAccels);
+      BreakerLog.log("SwerveDrivetrain/State/ModuleStates/RealModuleStates", state.ModuleStates);
+      BreakerLog.log("SwerveDrivetrain/State/ModuleStates/TargetModuleStates", state.ModuleTargets);
+      BreakerLog.log("SwerveDrivetrain/State/Odometry/SuccessfulDAQs", state.SuccessfulDaqs);
+      BreakerLog.log("SwerveDrivetrain/State/Odometry/FailedDAQs", state.FailedDaqs);
+      BreakerLog.log("SwerveDrivetrain/State/Odometry/OdometryPeriod", state.OdometryPeriod);
+    }
     
     if (userTelemetryCallback != null) {
       userTelemetryCallback.accept(state);
@@ -140,11 +142,13 @@ public class BreakerSwerveDrivetrain extends SwerveDrivetrain<TalonFX, TalonFX, 
   }
 
   private void lowFrequencyTelemetry() {
-    BreakerLog.log("SwerveDrivetrain/Modules/FrontLeft", getModules()[0]);
-    BreakerLog.log("SwerveDrivetrain/Modules/FrontLeft", getModules()[0]);
-    BreakerLog.log("SwerveDrivetrain/Modules/FrontLeft", getModules()[0]);
-    BreakerLog.log("SwerveDrivetrain/Modules/FrontLeft", getModules()[0]);
-    BreakerLog.log("SwerveDrivetrain/Pigeon2", getPigeon2());
+    if (BreakerLog.isVerboseLogging()) {
+      BreakerLog.log("SwerveDrivetrain/Modules/FrontLeft", getModules()[0]);
+      BreakerLog.log("SwerveDrivetrain/Modules/FrontRight", getModules()[1]);
+      BreakerLog.log("SwerveDrivetrain/Modules/BackLeft", getModules()[2]);
+      BreakerLog.log("SwerveDrivetrain/Modules/BackRight", getModules()[3]);
+      BreakerLog.log("SwerveDrivetrain/Pigeon2", getPigeon2());
+    }
   }
   
     /**

@@ -6,14 +6,14 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
-import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
-import frc.robot.BreakerLib.util.logging.BreakerLog;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
+import frc.robot.BreakerLib.util.logging.BreakerLog;
 
 public class Arm extends SubsystemBase {
 
@@ -34,7 +34,6 @@ public class Arm extends SubsystemBase {
      * stow, etc.)
      */
     public enum State {
-
         DOWN(Constants.ArmConstants.POSITION_DOWN),
         UP(Constants.ArmConstants.POSITION_UP),
         STOW(Constants.ArmConstants.POSITION_STOW);
@@ -67,10 +66,7 @@ public class Arm extends SubsystemBase {
         armMotor.getConfigurator().apply(talonFXConfig);
 
         // Zeroes: arm needs to be physically straight up or code will be off
-        // Needs seperate command, Needs limit switch (beam break) or absolute encoder
-        // on arm?
         armMotor.setPosition(0.0);
-        
     }
 
     public Command homePosition() {
@@ -103,24 +99,17 @@ public class Arm extends SubsystemBase {
     public void setVoltageOutput(double output) {
         armMotor.setControl(new DutyCycleOut(output));
     }
-    // public Command setWaitCommand(double waitSeconds) {
-    //     armMotor.setState(Constants.ArmConstants.POSITION_DOWN,  2);
-    // }
-
 
 
     @Override
-  public void periodic() {
+    public void periodic() {
 
-   if (state == State.DOWN && debouncer.calculate(beamBreak.isTriggered())) {
-        BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
-        roller.setState(Roller.State.ALGAE_STOW);
-        setState(State.STOW); 
-   }
-
-//    if (debouncer.calculate(beamBreak.isTriggered())) {
-//     BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
-//     System.out.println("Triggered!");
-//    }
- } 
+        // When we're intaking algae and the beam break has been triggered for 1 full second, 
+        // switch to stow state
+        if (state == State.DOWN && debouncer.calculate(beamBreak.isTriggered())) {
+                BreakerLog.log("Arm/BeamBreakEvent", "Beam Break Triggered!");
+                roller.setState(Roller.State.ALGAE_STOW);
+                setState(State.STOW); 
+        }
+    } 
 }
