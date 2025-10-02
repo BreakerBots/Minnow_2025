@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.hal.FRCNetComm.tResourceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.Units;
@@ -52,7 +53,7 @@ public class RobotContainer {
     private void configureBindings() {
 
         // LEFT BUMPER --> RESET LOCALIZER'S POSE
-        controller.getLeftBumper().onTrue(Commands.runOnce(() -> drivetrain.getLocalizer().resetPose(new Pose2d(0,0, Rotation2d.fromRotations(0.5)))));
+        controller.getLeftBumper().onTrue(Commands.runOnce(() -> drivetrain.getLocalizer().resetPose(new Pose2d(0,0, Rotation2d.fromRotations(0.0)))));
 
         // ---------------- SWERVE DRIVE ----------------
 
@@ -71,7 +72,8 @@ public class RobotContainer {
                 .clamp(1.0)
                 .deadband(Constants.OperatorConstants.ROTATIONAL_DEADBAND, 1.0)
                 .map(new BreakerLinearizedConstrainedExponential(0.364, 6.6, true))
-                .scale(Constants.DriveConstants.MAXIMUM_ROTATIONAL_VELOCITY.in(Units.RadiansPerSecond));
+                .scale(Constants.DriveConstants.MAXIMUM_ROTATIONAL_VELOCITY.in(Units.RadiansPerSecond))
+                .negate();
     
         drivetrain.setDefaultCommand(drivetrain.getTeleopControlCommand(driverX, driverY, driverOmega, Constants.DriveConstants.TELEOP_CONTROL_CONFIG));
 
@@ -82,19 +84,23 @@ public class RobotContainer {
         // controller.getButtonX().onTrue(arm.setStateCommand(Arm.State.LEFT));
         // controller.getButtonB().onTrue(arm.setStateCommand(Arm.State.RIGHT));
 
-        controller.getDPad().getUp().onTrue(arm.setStateCommand(Arm.State.UP));
-        controller.getDPad().getDown().onTrue(arm.setStateCommand(Arm.State.DOWN));
+        // controller.getDPad().getUp().onTrue(arm.setStateCommand(Arm.State.UP));
+        // controller.getDPad().getDown().onTrue(arm.setStateCommand(Arm.State.DOWN));
 
         //D-PAD UP/DOWN --> Manually move the arm clockwise and counterclockwise
-         controller.getDPad().getUp().onTrue(Commands.runOnce(() -> arm.setVoltageOutput(0.1)));
+         controller.getDPad().getUp().whileTrue(Commands.runOnce(() -> arm.setVoltageOutput(0.1)));
          controller.getDPad().getUp().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));
-         controller.getDPad().getDown().onTrue(Commands.runOnce(() -> arm.setVoltageOutput(-0.1)));
-         controller.getDPad().getDown().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));  
+         controller.getDPad().getDown().whileTrue(Commands.runOnce(() -> arm.setVoltageOutput(-0.1)));
+         controller.getDPad().getDown().onFalse(Commands.runOnce(() -> arm.setVoltageOutput(0.0)));
+
+         controller.getRightBumper().onTrue(Commands.runOnce(() -> arm.homePosition()));
 
         // ---------------- ROLLER ----------------
 
-        controller.getDPad().getLeft().whileTrue(roller.setSpeedCommand(Constants.RollerConstants.ALGAE_INTAKE_SPEED));
-        controller.getDPad().getRight().whileTrue(roller.setSpeedCommand(Constants.RollerConstants.ALGAE_EXTAKE_SPEED));
+        controller.getLeftTrigger().whileTrue(roller.setSpeedCommand(Constants.RollerConstants.ALGAE_INTAKE_SPEED));
+        controller.getLeftTrigger().onFalse(roller.setSpeedCommand(Constants.RollerConstants.IDLE_SPEED));
+        controller.getRightTrigger().whileTrue(roller.setSpeedCommand(Constants.RollerConstants.ALGAE_EXTAKE_SPEED));
+        controller.getRightTrigger().onFalse(roller.setSpeedCommand(Constants.RollerConstants.IDLE_SPEED));
 
         // ---------------- STATES ----------------
 
@@ -126,6 +132,6 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return Autos.moveForward(drivetrain);
+        return Autos.moveForward(drivetrain, roller);
     }
 }

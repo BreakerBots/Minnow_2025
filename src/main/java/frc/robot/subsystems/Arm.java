@@ -8,7 +8,7 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import frc.robot.BreakerLib.sensors.BreakerDigitalSensor;
 import frc.robot.BreakerLib.util.logging.BreakerLog;
-
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,8 +22,9 @@ public class Arm extends SubsystemBase {
             Constants.GeneralConstants.SUPERSTRUCTURE_CANIVORE_BUS.getName());
     private Roller roller;
 
-    private final BreakerDigitalSensor beamBreak = BreakerDigitalSensor.fromDIO(Constants.ArmConstants.BEAM_BREAK_DIO_PORT, true);
+    private final BreakerDigitalSensor beamBreak = BreakerDigitalSensor.fromDIO(Constants.ArmConstants.BEAM_BREAK_DIO_PORT, false);
     
+    private Debouncer debouncer = new Debouncer(1);
 
     public State state = State.UP;
 
@@ -72,6 +73,10 @@ public class Arm extends SubsystemBase {
         
     }
 
+    public Command homePosition() {
+        return Commands.runOnce(() -> armMotor.setPosition(0.0));
+    }
+
     public void setRoller(Roller roller) {
         this.roller = roller;
     }
@@ -98,16 +103,24 @@ public class Arm extends SubsystemBase {
     public void setVoltageOutput(double output) {
         armMotor.setControl(new DutyCycleOut(output));
     }
+    // public Command setWaitCommand(double waitSeconds) {
+    //     armMotor.setState(Constants.ArmConstants.POSITION_DOWN,  2);
+    // }
 
 
 
     @Override
   public void periodic() {
 
-   if (state == State.DOWN && beamBreak.isTriggered()) {
+   if (state == State.DOWN && debouncer.calculate(beamBreak.isTriggered())) {
         BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
-        //roller.setState(Roller.State.ALGAE_STOW);
-        //setState(State.STOW); 
+        roller.setState(Roller.State.ALGAE_STOW);
+        setState(State.STOW); 
    }
+
+//    if (debouncer.calculate(beamBreak.isTriggered())) {
+//     BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
+//     System.out.println("Triggered!");
+//    }
  } 
 }
