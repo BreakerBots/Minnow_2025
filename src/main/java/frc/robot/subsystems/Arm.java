@@ -24,7 +24,7 @@ public class Arm extends SubsystemBase {
 
     private final BreakerDigitalSensor beamBreak = BreakerDigitalSensor.fromDIO(Constants.ArmConstants.BEAM_BREAK_DIO_PORT, false);
     
-    private Debouncer debouncer = new Debouncer(1);
+    private Debouncer debouncer = new Debouncer(0.5);
 
     public State state = State.UP;
 
@@ -37,6 +37,7 @@ public class Arm extends SubsystemBase {
 
         DOWN(Constants.ArmConstants.POSITION_DOWN),
         UP(Constants.ArmConstants.POSITION_UP),
+        EXTAKE(Constants.ArmConstants.POSITION_EXTAKE),
         STOW(Constants.ArmConstants.POSITION_STOW);
 
         private Rotation2d rotation;
@@ -63,6 +64,8 @@ public class Arm extends SubsystemBase {
         slot0Configs.kI = Constants.ArmConstants.kI;
         slot0Configs.kD = Constants.ArmConstants.kD;
         slot0Configs.kS = Constants.ArmConstants.kS;
+        slot0Configs.kG = Constants.ArmConstants.kG;
+
 
         armMotor.getConfigurator().apply(talonFXConfig);
 
@@ -116,7 +119,13 @@ public class Arm extends SubsystemBase {
         BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
         roller.setState(Roller.State.ALGAE_STOW);
         setState(State.STOW); 
-   }
+    }
+
+    if (roller.getState() == Roller.State.ALGAE_EXTAKE && state == State.UP && debouncer.calculate(!beamBreak.isTriggered())) {
+        // BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
+        roller.setState(Roller.State.IDLE);
+        setState(State.STOW); 
+    }
 
 //    if (debouncer.calculate(beamBreak.isTriggered())) {
 //     BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");

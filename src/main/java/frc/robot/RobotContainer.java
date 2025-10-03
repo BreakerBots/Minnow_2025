@@ -18,6 +18,7 @@ import frc.robot.BreakerLib.driverstation.gamepad.controllers.BreakerXboxControl
 import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExponential;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Roller.State;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -112,8 +113,10 @@ public class RobotContainer {
         );
         controller.getButtonY().onTrue(
             Commands.sequence(
-                arm.setStateCommand(Arm.State.UP),
-                roller.setStateCommand(Roller.State.CORAL_EXTAKE)
+                arm.setStateCommand(Arm.State.EXTAKE),
+                roller.setStateCommand(Roller.State.CORAL_EXTAKE),
+                Commands.waitSeconds(0.1),
+                roller.setStateCommand(Roller.State.IDLE)
             )
         );
         controller.getButtonA().onTrue(

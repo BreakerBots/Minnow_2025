@@ -69,12 +69,15 @@ public final class Constants {
     // ---------------- ARM ----------------
 
     public static class ArmConstants {
+        // Test arm
         public static final Rotation2d POSITION_LEFT = Rotation2d.fromRotations(3); 
         public static final Rotation2d POSITION_RIGHT = Rotation2d.fromRotations(-3); 
         public static final Rotation2d POSITION_MIDDLE = Rotation2d.fromRotations(0); 
+        
         public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); // 0
-        public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(-1.75);
-        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-8.5); 
+        public static final Rotation2d POSITION_EXTAKE = Rotation2d.fromRotations(0.2); 
+        public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(-5.0);
+        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-9.0); 
         public static final int ARM_MOTOR_ID = 43; 
         public static final double ARM_CURRENT_LIMIT = 60.0;
         public static final int BEAM_BREAK_DIO_PORT = 9;
@@ -84,7 +87,7 @@ public final class Constants {
         public static final double kI = 0.003;
         public static final double kD = 0.002;
         public static final double kS = 0.1;
-        public static final double kG = 0.5;
+        public static final double kG = 0.02;
     }
 
 
@@ -110,8 +113,8 @@ public final class Constants {
             new PIDConstants(1.5, 0, 0));// 1.5
         // public static final SetpointGenerationConfig SETPOINT_GENERATION_CONFIG = new
         // SetpointGenerationConfig(MAXIMUM_MODULE_AZIMUTH_SPEED);
-        public static final TeleopControlConfig TELEOP_CONTROL_CONFIG = new TeleopControlConfig()
-            .withHeadingCompensation(HEADING_COMPENSATION_CONFIG);
+        public static final TeleopControlConfig TELEOP_CONTROL_CONFIG = new TeleopControlConfig();
+            // .withHeadingCompensation(HEADING_COMPENSATION_CONFIG);
         // .withSetpointGeneration(SETPOINT_GENERATION_CONFIG);
         public static final LinearVelocity MAXIMUM_TRANSLATIONAL_VELOCITY = Units.MetersPerSecond.of(4.5);
         public static final AngularVelocity MAXIMUM_ROTATIONAL_VELOCITY = Units.RadiansPerSecond.of(9.5);
@@ -217,7 +220,7 @@ public final class Constants {
         private static final int kFrontLeftDriveMotorId = 10;
         private static final int kFrontLeftSteerMotorId = 11;
         private static final int kFrontLeftEncoderId = 50;
-        private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.204345703125);
+        private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.20751953125);
         private static final boolean kFrontLeftSteerInvert = true;
         private static final boolean kFrontLeftEncoderInvert = false;
         private static final Translation2d kFrontLeftModulePosition = new Translation2d(
@@ -228,7 +231,7 @@ public final class Constants {
         private static final int kFrontRightDriveMotorId = 12;
         private static final int kFrontRightSteerMotorId = 13;
         private static final int kFrontRightEncoderId = 21;
-        private static final Angle kFrontRightEncoderOffset = Rotations.of(0.171142578125 + 0.5);
+        private static final Angle kFrontRightEncoderOffset = Rotations.of(-0.32177734375);
         private static final boolean kFrontRightSteerInvert = true;
         private static final boolean kFrontRightEncoderInvert = false;
 
@@ -252,7 +255,7 @@ public final class Constants {
         private static final int kBackRightDriveMotorId = 16;
         private static final int kBackRightSteerMotorId = 17;
         private static final int kBackRightEncoderId = 23;
-        private static final Angle kBackRightEncoderOffset = Rotations.of(0.00830078125 + 0.5);
+        private static final Angle kBackRightEncoderOffset = Rotations.of(-0.496826171875);
         private static final boolean kBackRightSteerInvert = true;
         private static final boolean kBackRightEncoderInvert = false;
         private static final Translation2d kBackRightModulePosition = new Translation2d(
