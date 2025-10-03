@@ -115,7 +115,7 @@ public class RobotContainer {
             Commands.sequence(
                 arm.setStateCommand(Arm.State.EXTAKE),
                 roller.setStateCommand(Roller.State.CORAL_EXTAKE),
-                Commands.waitSeconds(0.1),
+                Commands.waitSeconds(0.7),   // NEED TEST TODO
                 roller.setStateCommand(Roller.State.IDLE)
             )
         );
