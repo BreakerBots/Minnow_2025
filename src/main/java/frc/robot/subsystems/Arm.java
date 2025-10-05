@@ -24,7 +24,7 @@ public class Arm extends SubsystemBase {
 
     private final BreakerDigitalSensor beamBreak = BreakerDigitalSensor.fromDIO(Constants.ArmConstants.BEAM_BREAK_DIO_PORT, false);
     
-    private Debouncer debouncer = new Debouncer(0.5);
+    private Debouncer debouncer = new Debouncer(0.48);
 
     public State state = State.UP;
 
@@ -124,7 +124,7 @@ public class Arm extends SubsystemBase {
     if (roller.getState() == Roller.State.ALGAE_EXTAKE && state == State.UP && debouncer.calculate(!beamBreak.isTriggered())) {
         // BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
         roller.setState(Roller.State.IDLE);
-        setState(State.STOW); 
+        setState(State.UP); 
     }
 
 //    if (debouncer.calculate(beamBreak.isTriggered())) {

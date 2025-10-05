@@ -135,6 +135,6 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return Autos.moveForward(drivetrain, roller);
+        return Autos.moveForward(drivetrain, roller, arm);
     }
 }
