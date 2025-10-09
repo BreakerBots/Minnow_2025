@@ -4,20 +4,15 @@
 
 package frc.robot.BreakerLib.swerve;
 
-import static java.lang.Math.random;
-
-import java.io.ObjectInputStream.GetField;
 import java.util.Optional;
-
-import javax.print.DocPrintJob;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.ModuleRequest;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.mechanisms.swerve.LegacySwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.util.DriveFeedforwards;
@@ -28,14 +23,13 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.Measure;
 import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+
 import frc.robot.BreakerLib.driverstation.BreakerInputStream;
 import frc.robot.BreakerLib.physics.BreakerVector2;
 import frc.robot.BreakerLib.util.logging.BreakerLog;
@@ -126,7 +120,9 @@ public class BreakerSwerveTeleopControl extends Command {
       SwerveModuleState[] moduleStates = curSetpoint.moduleStates();
       double[] robotRelativeForcesXNewtons = curSetpoint.feedforwards().robotRelativeForcesXNewtons();
       double[] robotRelativeForcesYNewtons = curSetpoint.feedforwards().robotRelativeForcesYNewtons();
-      BreakerLog.log("SwerveTeleopControlCommand/CommandedSpeeds", curSetpoint.robotRelativeSpeeds());
+      if (BreakerLog.isVerboseLogging()) {
+        BreakerLog.log("SwerveTeleopControlCommand/CommandedSpeeds", curSetpoint.robotRelativeSpeeds());
+      }
       for (int i = 0; i < curSetpoint.moduleStates().length; i++) {
         SwerveModule<TalonFX, TalonFX, CANcoder> module = drivetrain.getModule(i);
         module.apply(new ModuleRequest()
@@ -140,7 +136,9 @@ public class BreakerSwerveTeleopControl extends Command {
       prevSetpoint = curSetpoint;
     } else {
       request.withVelocityX(xImpt).withVelocityY(yImpt).withRotationalRate(omegaImpt);
-      BreakerLog.log("SwerveTeleopControlCommand/CommandedSpeeds", new ChassisSpeeds(request.VelocityX, request.VelocityY, request.RotationalRate));
+      if (BreakerLog.isVerboseLogging()) {
+        BreakerLog.log("SwerveTeleopControlCommand/CommandedSpeeds", new ChassisSpeeds(request.VelocityX, request.VelocityY, request.RotationalRate));
+      }
       drivetrain.setControl(request);
     }
   }

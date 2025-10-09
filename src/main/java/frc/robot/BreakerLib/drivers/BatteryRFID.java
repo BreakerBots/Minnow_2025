@@ -80,13 +80,14 @@ public class BatteryRFID extends SubsystemBase {
             }
         }
 
-        if (batteryInfo.isPresent()) {
-            batteryInfo.get().log();
-        } else {
-            DEFAULT_BATTERY_INFO.log();
+        if (BreakerLog.isVerboseLogging()) {
+            if (batteryInfo.isPresent()) {
+                batteryInfo.get().log();
+            } else {
+                DEFAULT_BATTERY_INFO.log();
+            }
+            BreakerLog.log("LoggedBattery/HasRead", batteryInfo.isPresent());
         }
-
-        BreakerLog.log("LoggedBattery/HasRead", batteryInfo.isPresent());
 
             
         if (Robot.isReal() && batteryInfo.isPresent()) {

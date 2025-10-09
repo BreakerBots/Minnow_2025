@@ -21,21 +21,21 @@ public class Roller extends SubsystemBase {
   private State state = State.IDLE;
 
   public enum State {
-    CORAL_EXTAKE(Constants.RollerConstants.CORAL_EXTAKE_SPEED),
-    ALGAE_EXTAKE(Constants.RollerConstants.ALGAE_EXTAKE_SPEED),
-    ALGAE_INTAKE(Constants.RollerConstants.ALGAE_INTAKE_SPEED),
-    ALGAE_STOW(Constants.RollerConstants.ALGAE_STOW_SPEED),
-    IDLE(Constants.RollerConstants.IDLE_SPEED);
+      CORAL_EXTAKE(Constants.RollerConstants.CORAL_EXTAKE_SPEED),
+      ALGAE_EXTAKE(Constants.RollerConstants.ALGAE_EXTAKE_SPEED),
+      ALGAE_INTAKE(Constants.RollerConstants.ALGAE_INTAKE_SPEED),
+      ALGAE_STOW(Constants.RollerConstants.ALGAE_STOW_SPEED),
+      IDLE(Constants.RollerConstants.IDLE_SPEED);
 
-    private double speed;
+      private double speed;
 
-    private State(double speed) {
-        this.speed = speed;
-    }
+      private State(double speed) {
+          this.speed = speed;
+      }
 
-    public double getSpeed() {
-        return speed;
-    }
+      public double getSpeed() {
+          return speed;
+      }
   }
 
   public State getState() {
@@ -43,26 +43,26 @@ public class Roller extends SubsystemBase {
   }
 
   public void setState(State newState) {
-    State previousState = state;
-    state = newState;
-    setSpeed(state.getSpeed());
-    
-    // Log state change
-    BreakerLog.log("Roller/State/Previous", previousState.toString());
-    BreakerLog.log("Roller/State/Current", state.toString());
-    BreakerLog.log("Roller/State/Speed", state.getSpeed());
+      State previousState = state;
+      state = newState;
+      setSpeed(state.getSpeed());
+      
+      // Log state change
+      BreakerLog.log("Roller/State/Previous", previousState.toString());
+      BreakerLog.log("Roller/State/Current", state.toString());
+      BreakerLog.log("Roller/State/Speed", state.getSpeed());
   }
 
   public Command setStateCommand(State newState) {
-    return Commands.runOnce(() -> setState(newState));
+      return Commands.runOnce(() -> setState(newState));
   }
 
   public void setSpeed(double speed) {
-    rollerMotor.setControl(new DutyCycleOut(speed));
+      rollerMotor.setControl(new DutyCycleOut(speed));
   }
 
   public Command setSpeedCommand(double speed) {
-    return Commands.runOnce(() -> setSpeed(speed));
+      return Commands.runOnce(() -> setSpeed(speed));
   }
 
   public Roller() {
