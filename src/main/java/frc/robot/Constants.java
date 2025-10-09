@@ -69,28 +69,58 @@ public final class Constants {
     // ---------------- ARM ----------------
 
     public static class ArmConstants {
+        // Test arm
         public static final Rotation2d POSITION_LEFT = Rotation2d.fromRotations(3); 
         public static final Rotation2d POSITION_RIGHT = Rotation2d.fromRotations(-3); 
         public static final Rotation2d POSITION_MIDDLE = Rotation2d.fromRotations(0); 
+        
         public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); // 0
-        public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(0);
-        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-8.5); 
+        public static final Rotation2d POSITION_EXTAKE = Rotation2d.fromRotations(0.2); 
+        public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(-5.0);
+        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-9.0); 
         public static final int ARM_MOTOR_ID = 43; 
         public static final double ARM_CURRENT_LIMIT = 60.0;
         public static final int BEAM_BREAK_DIO_PORT = 9;
        
+        // ARM TUNING GUIDE - Follow this order for best results:
+        // 1. MOTION MAGIC: Start with conservative values, tune for smooth motion profiles
+        //    - Cruise velocity (Speed Limit): Start 0.5-1.0, adjust by ±0.25 (increase for faster, decrease if overshooting)
+        //    - Acceleration (Speed Change Rate): Start 1.0-2.0, adjust by ±0.5 (increase for snappier, decrease if jerky)
+        //    - Jerk (Smoothness Control): Start 5.0-10.0, adjust by ±2.5 (increase for smoother, decrease if too slow)
+        // 2. FEEDFORWARD: Tune to reduce PID workload and improve efficiency
+        //    - kS (Static Friction): Start 0.05-0.15, adjust by ±0.02 (increase if motor doesn't start moving)
+        //    - kG (Gravity Compensation): Start 0.01-0.05, adjust by ±0.01 (increase if arm sags, decrease if overshoots up)
+        //    - kV (Velocity Tracking): Start 0.08-0.15, adjust by ±0.02 (increase if too slow, decrease if too fast)
+        //    - kA (Acceleration Help): Start 0.005-0.02, adjust by ±0.005 (increase if too slow, decrease if jerky)
+        // 3. PID: Fine-tune for accurate positioning and stability
+        //    - kP (Position Correction): Start 0.03-0.08, adjust by ±0.01 (increase if slow, decrease if oscillating)
+        //    - kI (Steady-State Accuracy): Start 0.001-0.005, adjust by ±0.001 (increase if drifts, decrease if overshooting)
+        //    - kD (Oscillation Damping): Start 0.001-0.005, adjust by ±0.001 (increase if oscillating, decrease if jerky)
+        
         // PhoenixTuner Slot0 values
-        public static final double kP = 0.05;
-        public static final double kI = 0.003;
-        public static final double kD = 0.002;
-        public static final double kS = 0.1;
+        
+        // MotionMagic tuning (rotations/second, rotations/second^2, rotations/second^3)
+        public static final double MM_CRUISE_VELOCITY = 0.75;   // Speed limit in rotations/second (increase for faster moves, decrease if arm overshoots or oscillates)
+        public static final double MM_ACCELERATION = 2.0;       // How quickly arm accelerates to speed limit (increase for snappier response, decrease if jerky or causes overshoot)
+        public static final double MM_JERK = 10.0;              // Rate of change of acceleration - smoothness control (increase for smoother motion, decrease if too slow to reach target)
+
+        // FeedForward
+        public static final double kS = 0.1;   // Static friction feedforward - minimum voltage to overcome static friction (increase if motor doesn't start moving)
+        public static final double kG = 0.02;  // Gravity feedforward - compensates for gravity at different arm positions (increase if arm sags, decrease if it overshoots up)
+        public static final double kV = 0.12;  // Velocity feedforward - voltage per unit velocity (increase if arm moves too slow, decrease if too fast)
+        public static final double kA = 0.01;  // Acceleration feedforward - voltage per unit acceleration (increase if arm accelerates too slow, decrease if jerky)
+
+        // PID
+        public static final double kP = 0.05;  // Proportional gain - how aggressively to correct position errors (increase if slow response, decrease if oscillating)
+        public static final double kI = 0.003; // Integral gain - eliminates steady-state error (increase if position drifts, decrease if overshooting)
+        public static final double kD = 0.002; // Derivative gain - reduces oscillation and overshoot (increase if oscillating, decrease if jerky)
     }
 
 
     // ---------------- ROLLER ----------------
     public static class RollerConstants {
         public static final int ROLLER_MOTOR_ID = 24; 
-        public static final double CORAL_EXTAKE_SPEED = 0.2; // -0.5
+        public static final double CORAL_EXTAKE_SPEED = 0.15; // -0.5
         public static final double ALGAE_EXTAKE_SPEED = -0.3; // -0.3
         public static final double ALGAE_INTAKE_SPEED = 0.4; // 0.4
         public static final double IDLE_SPEED = 0.0;
@@ -109,8 +139,8 @@ public final class Constants {
             new PIDConstants(1.5, 0, 0));// 1.5
         // public static final SetpointGenerationConfig SETPOINT_GENERATION_CONFIG = new
         // SetpointGenerationConfig(MAXIMUM_MODULE_AZIMUTH_SPEED);
-        public static final TeleopControlConfig TELEOP_CONTROL_CONFIG = new TeleopControlConfig()
-            .withHeadingCompensation(HEADING_COMPENSATION_CONFIG);
+        public static final TeleopControlConfig TELEOP_CONTROL_CONFIG = new TeleopControlConfig();
+            // .withHeadingCompensation(HEADING_COMPENSATION_CONFIG);
         // .withSetpointGeneration(SETPOINT_GENERATION_CONFIG);
         public static final LinearVelocity MAXIMUM_TRANSLATIONAL_VELOCITY = Units.MetersPerSecond.of(4.5);
         public static final AngularVelocity MAXIMUM_ROTATIONAL_VELOCITY = Units.RadiansPerSecond.of(9.5);
@@ -216,7 +246,7 @@ public final class Constants {
         private static final int kFrontLeftDriveMotorId = 10;
         private static final int kFrontLeftSteerMotorId = 11;
         private static final int kFrontLeftEncoderId = 50;
-        private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.204345703125);
+        private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.20751953125);
         private static final boolean kFrontLeftSteerInvert = true;
         private static final boolean kFrontLeftEncoderInvert = false;
         private static final Translation2d kFrontLeftModulePosition = new Translation2d(
@@ -227,7 +257,7 @@ public final class Constants {
         private static final int kFrontRightDriveMotorId = 12;
         private static final int kFrontRightSteerMotorId = 13;
         private static final int kFrontRightEncoderId = 21;
-        private static final Angle kFrontRightEncoderOffset = Rotations.of(0.171142578125 + 0.5);
+        private static final Angle kFrontRightEncoderOffset = Rotations.of(-0.32177734375);
         private static final boolean kFrontRightSteerInvert = true;
         private static final boolean kFrontRightEncoderInvert = false;
 
@@ -251,7 +281,7 @@ public final class Constants {
         private static final int kBackRightDriveMotorId = 16;
         private static final int kBackRightSteerMotorId = 17;
         private static final int kBackRightEncoderId = 23;
-        private static final Angle kBackRightEncoderOffset = Rotations.of(0.00830078125 + 0.5);
+        private static final Angle kBackRightEncoderOffset = Rotations.of(-0.496826171875);
         private static final boolean kBackRightSteerInvert = true;
         private static final boolean kBackRightEncoderInvert = false;
         private static final Translation2d kBackRightModulePosition = new Translation2d(

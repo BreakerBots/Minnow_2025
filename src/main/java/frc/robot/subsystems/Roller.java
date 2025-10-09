@@ -18,8 +18,7 @@ public class Roller extends SubsystemBase {
 
   private final TalonFX rollerMotor = new TalonFX(Constants.RollerConstants.ROLLER_MOTOR_ID, Constants.GeneralConstants.SUPERSTRUCTURE_CANIVORE_BUS.getName());
 
-  public State state = State.IDLE;
-
+  private State state = State.IDLE;
 
   public enum State {
       CORAL_EXTAKE(Constants.RollerConstants.CORAL_EXTAKE_SPEED),
@@ -37,6 +36,10 @@ public class Roller extends SubsystemBase {
       public double getSpeed() {
           return speed;
       }
+  }
+
+  public State getState() {
+    return state;
   }
 
   public void setState(State newState) {

@@ -18,6 +18,7 @@ import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExpo
 import frc.robot.BreakerLib.util.logging.BreakerLog;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Roller.State;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -113,8 +114,10 @@ public class RobotContainer {
         //CORAL EXTAKE
         controller.getButtonY().onTrue(
             Commands.sequence(
-                arm.setStateCommand(Arm.State.UP),
-                roller.setStateCommand(Roller.State.CORAL_EXTAKE)
+                arm.setStateCommand(Arm.State.EXTAKE),
+                roller.setStateCommand(Roller.State.CORAL_EXTAKE),
+                Commands.waitSeconds(0.7),   // NEED TEST TODO
+                roller.setStateCommand(Roller.State.IDLE)
             )
         );
 
@@ -137,6 +140,6 @@ public class RobotContainer {
 
 
     public Command getAutonomousCommand() {
-        return Autos.moveForward(drivetrain, roller);
+        return Autos.moveForward(drivetrain, roller, arm);
     }
 }

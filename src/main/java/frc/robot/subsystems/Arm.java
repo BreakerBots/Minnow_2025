@@ -24,7 +24,7 @@ public class Arm extends SubsystemBase {
 
     private final BreakerDigitalSensor beamBreak = BreakerDigitalSensor.fromDIO(Constants.ArmConstants.BEAM_BREAK_DIO_PORT, false);
     
-    private Debouncer debouncer = new Debouncer(1);
+    private Debouncer debouncer = new Debouncer(0.48);
 
     public State state = State.UP;
 
@@ -36,6 +36,7 @@ public class Arm extends SubsystemBase {
     public enum State {
         DOWN(Constants.ArmConstants.POSITION_DOWN),
         UP(Constants.ArmConstants.POSITION_UP),
+        EXTAKE(Constants.ArmConstants.POSITION_EXTAKE),
         STOW(Constants.ArmConstants.POSITION_STOW);
 
         private Rotation2d rotation;
@@ -62,6 +63,8 @@ public class Arm extends SubsystemBase {
         slot0Configs.kI = Constants.ArmConstants.kI;
         slot0Configs.kD = Constants.ArmConstants.kD;
         slot0Configs.kS = Constants.ArmConstants.kS;
+        slot0Configs.kG = Constants.ArmConstants.kG;
+
 
         armMotor.getConfigurator().apply(talonFXConfig);
 
@@ -104,12 +107,21 @@ public class Arm extends SubsystemBase {
     @Override
     public void periodic() {
 
-        // When we're intaking algae and the beam break has been triggered for 1 full second, 
-        // switch to stow state
-        if (state == State.DOWN && debouncer.calculate(beamBreak.isTriggered())) {
-                BreakerLog.log("Arm/BeamBreakEvent", "Beam Break Triggered!");
-                roller.setState(Roller.State.ALGAE_STOW);
-                setState(State.STOW); 
+       if (state == State.DOWN && debouncer.calculate(beamBreak.isTriggered())) {
+            BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
+            roller.setState(Roller.State.ALGAE_STOW);
+            setState(State.STOW); 
         }
+
+        if (roller.getState() == Roller.State.ALGAE_EXTAKE && state == State.UP && debouncer.calculate(!beamBreak.isTriggered())) {
+            // BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
+            roller.setState(Roller.State.IDLE);
+            setState(State.UP); 
+        }
+
+        //if (debouncer.calculate(beamBreak.isTriggered())) {
+        //    BreakerLog.log("Arm/BeamBreakEvent", "Triggered!");
+        //    System.out.println("Triggered!");
+        //}
     } 
 }
