@@ -77,27 +77,17 @@ public final class Constants {
         public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); // 0
         public static final Rotation2d POSITION_EXTAKE = Rotation2d.fromRotations(0.2); 
         public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(-5.0);
-        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-9.0); 
-        public static final int ARM_MOTOR_ID = 43; 
+        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-9.2); 
+        public static final int ARM_MOTOR_ID = 43;
         public static final double ARM_CURRENT_LIMIT = 60.0;
         public static final int BEAM_BREAK_DIO_PORT = 9;
        
-        // ARM TUNING GUIDE - Follow this order for best results:
-        // 1. MOTION MAGIC: Start with conservative values, tune for smooth motion profiles
-        //    - Cruise velocity (Speed Limit): Start 0.5-1.0, adjust by ±0.25 (increase for faster, decrease if overshooting)
-        //    - Acceleration (Speed Change Rate): Start 1.0-2.0, adjust by ±0.5 (increase for snappier, decrease if jerky)
-        //    - Jerk (Smoothness Control): Start 5.0-10.0, adjust by ±2.5 (increase for smoother, decrease if too slow)
-        // 2. FEEDFORWARD: Tune to reduce PID workload and improve efficiency
-        //    - kS (Static Friction): Start 0.05-0.15, adjust by ±0.02 (increase if motor doesn't start moving)
-        //    - kG (Gravity Compensation): Start 0.01-0.05, adjust by ±0.01 (increase if arm sags, decrease if overshoots up)
-        //    - kV (Velocity Tracking): Start 0.08-0.15, adjust by ±0.02 (increase if too slow, decrease if too fast)
-        //    - kA (Acceleration Help): Start 0.005-0.02, adjust by ±0.005 (increase if too slow, decrease if jerky)
-        // 3. PID: Fine-tune for accurate positioning and stability
-        //    - kP (Position Correction): Start 0.03-0.08, adjust by ±0.01 (increase if slow, decrease if oscillating)
-        //    - kI (Steady-State Accuracy): Start 0.001-0.005, adjust by ±0.001 (increase if drifts, decrease if overshooting)
-        //    - kD (Oscillation Damping): Start 0.001-0.005, adjust by ±0.001 (increase if oscillating, decrease if jerky)
-        
         // PhoenixTuner Slot0 values
+        public static final double kP = 0.05;
+        public static final double kI = 0.003;//3;
+        public static final double kD = 0.002;
+        public static final double kS = 0.1;
+        public static final double kG = 0.02;
         
         // MotionMagic tuning (rotations/second, rotations/second^2, rotations/second^3)
         public static final double MM_CRUISE_VELOCITY = 0.75;   // Speed limit in rotations/second (increase for faster moves, decrease if arm overshoots or oscillates)
@@ -123,6 +113,7 @@ public final class Constants {
         public static final double CORAL_EXTAKE_SPEED = 0.15; // -0.5
         public static final double ALGAE_EXTAKE_SPEED = -0.3; // -0.3
         public static final double ALGAE_INTAKE_SPEED = 0.4; // 0.4
+
         public static final double IDLE_SPEED = 0.0;
         public static final double ROLLER_CURRENT_LIMIT = 60; // 30 for algae stuck
         public static final double ALGAE_STOW_SPEED = 0.0;
