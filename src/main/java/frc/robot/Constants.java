@@ -77,17 +77,10 @@ public final class Constants {
         public static final Rotation2d POSITION_UP = Rotation2d.fromRotations(0); // 0
         public static final Rotation2d POSITION_EXTAKE = Rotation2d.fromRotations(0.2); 
         public static final Rotation2d POSITION_STOW = Rotation2d.fromRotations(-5.0);
-        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-9.2); 
+        public static final Rotation2d POSITION_DOWN = Rotation2d.fromRotations(-9.2);
         public static final int ARM_MOTOR_ID = 43;
         public static final double ARM_CURRENT_LIMIT = 60.0;
         public static final int BEAM_BREAK_DIO_PORT = 9;
-       
-        // PhoenixTuner Slot0 values
-        public static final double kP = 0.05;
-        public static final double kI = 0.003;//3;
-        public static final double kD = 0.002;
-        public static final double kS = 0.1;
-        public static final double kG = 0.02;
         
         // MotionMagic tuning (rotations/second, rotations/second^2, rotations/second^3)
         public static final double MM_CRUISE_VELOCITY = 0.75;   // Speed limit in rotations/second (increase for faster moves, decrease if arm overshoots or oscillates)

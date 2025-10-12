@@ -86,6 +86,7 @@ public class Arm extends SubsystemBase {
         setArmPosition(state.getRotation2d().getRotations());
         
         // Log state change
+        System.out.println("Arm state changed from " + previousState.toString() + " to " + state.toString());
         BreakerLog.log("Arm/State/Previous", previousState.toString());
         BreakerLog.log("Arm/State/Current", state.toString());
         BreakerLog.log("Arm/State/Position", state.getRotation2d().getRotations());
