@@ -59,12 +59,22 @@ public class Arm extends SubsystemBase {
         talonFXConfig.CurrentLimits.StatorCurrentLimit = Constants.ArmConstants.ARM_CURRENT_LIMIT;
 
         Slot0Configs slot0Configs = talonFXConfig.Slot0;
+
+        // Motion Magic
+        talonFXConfig.MotionMagic.MotionMagicCruiseVelocity = Constants.ArmConstants.MM_CRUISE_VELOCITY;
+        talonFXConfig.MotionMagic.MotionMagicAcceleration = Constants.ArmConstants.MM_ACCELERATION;
+        talonFXConfig.MotionMagic.MotionMagicJerk = Constants.ArmConstants.MM_JERK;
+        
+        // Feedforward
+        slot0Configs.kS = Constants.ArmConstants.kS;
+        slot0Configs.kG = Constants.ArmConstants.kG;
+        slot0Configs.kV = Constants.ArmConstants.kV;
+        slot0Configs.kA = Constants.ArmConstants.kA;
+
+        // PID
         slot0Configs.kP = Constants.ArmConstants.kP;
         slot0Configs.kI = Constants.ArmConstants.kI;
         slot0Configs.kD = Constants.ArmConstants.kD;
-        slot0Configs.kS = Constants.ArmConstants.kS;
-        slot0Configs.kG = Constants.ArmConstants.kG;
-
 
         armMotor.getConfigurator().apply(talonFXConfig);
 
