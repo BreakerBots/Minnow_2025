@@ -51,12 +51,11 @@ public class Arm extends SubsystemBase {
     }
 
     public Arm() {
-
         // Configure our arm motor
         TalonFXConfiguration talonFXConfig = new TalonFXConfiguration();
         talonFXConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         talonFXConfig.CurrentLimits.StatorCurrentLimitEnable = true;
-        talonFXConfig.CurrentLimits.StatorCurrentLimit = Constants.ArmConstants.ARM_CURRENT_LIMIT;
+        talonFXConfig.CurrentLimits.StatorCurrentLimit = Constants.ArmConstants.ARM_CURRENT_LIMIT;  
 
         Slot0Configs slot0Configs = talonFXConfig.Slot0;
 

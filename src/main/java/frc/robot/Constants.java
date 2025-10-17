@@ -102,7 +102,7 @@ public final class Constants {
         // MotionMagic tuning (rotations/second, rotations/second^2, rotations/second^3)
         public static final double MM_CRUISE_VELOCITY = 0.0;   // Speed limit in rotations/second (increase for faster moves, decrease if arm overshoots or oscillates)
         public static final double MM_ACCELERATION = 0.0;       // How quickly arm accelerates to speed limit (increase for snappier response, decrease if jerky or causes overshoot)
-        public static final double MM_JERK = 0.0;              // Rate of change of acceleration - smoothness control (increase for smoother motion, decrease if too slow to reach target)
+        public static final double MM_JERK = 0.05;              // Rate of change of acceleration - smoothness control (increase for smoother motion, decrease if too slow to reach target)
 
         // FeedForward
         public static final double kS = 0.1;   // Static friction feedforward - minimum voltage to overcome static friction (increase if motor doesn't start moving)
@@ -113,7 +113,7 @@ public final class Constants {
         // PID
         public static final double kP = 0.05;  // Proportional gain - how aggressively to correct position errors (increase if slow response, decrease if oscillating)
         public static final double kI = 0.003; // Integral gain - eliminates steady-state error (increase if position drifts, decrease if overshooting)
-        public static final double kD = 0.002; // Derivative gain - reduces oscillation and overshoot (increase if oscillating, decrease if jerky)
+        public static final double kD = 0.001; // Derivative gain - reduces oscillation and overshoot (increase if oscillating, decrease if jerky)
     }
 
 
