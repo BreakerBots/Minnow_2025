@@ -26,6 +26,7 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    
   }
 
   /**
@@ -87,6 +88,8 @@ public class Robot extends TimedRobot {
     CommandScheduler.getInstance().cancelAll();
   }
 
+  
+
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
@@ -98,4 +101,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically whilst in simulation. */
   @Override
   public void simulationPeriodic() {}
+  @Override
+  public void robotInit() {
+    
+  }
+  
 }

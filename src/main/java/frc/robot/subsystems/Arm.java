@@ -8,6 +8,10 @@ import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionDutyCycle;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -79,6 +83,21 @@ public class Arm extends SubsystemBase {
 
         // Zeroes: arm needs to be physically straight up or code will be off
         armMotor.setPosition(0.0);
+
+        setupLogging();
+    }
+
+    private void setupLogging() {
+        SmartDashboard.putData("Arm", new Sendable() {
+
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.setSmartDashboardType("Arm Angle");
+                    
+                builder.addDoubleProperty("Angle", () -> armMotor.getPosition().getValueAsDouble(), null);
+            }
+            
+        });
     }
 
     public Command homePosition() {
