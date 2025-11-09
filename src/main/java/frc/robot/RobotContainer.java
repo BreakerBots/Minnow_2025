@@ -4,8 +4,14 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -14,11 +20,14 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.BreakerLib.driverstation.BreakerInputStream;
 import frc.robot.BreakerLib.driverstation.BreakerInputStream2d;
 import frc.robot.BreakerLib.driverstation.gamepad.controllers.BreakerXboxController;
-import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExponential;
 import frc.robot.BreakerLib.util.logging.BreakerLog;
+import frc.robot.BreakerLib.util.math.functions.BreakerLinearizedConstrainedExponential;
 import frc.robot.commands.Autos;
-import frc.robot.subsystems.*;
-import frc.robot.subsystems.Roller.State;
+import frc.robot.subsystems.Arm;
+import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Roller;
+
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -82,6 +91,8 @@ public class RobotContainer {
     
         drivetrain.setDefaultCommand(drivetrain.getTeleopControlCommand(driverX, driverY, driverOmega, Constants.DriveConstants.TELEOP_CONTROL_CONFIG));
 
+        controller.getBackButton().onTrue(rotateToTagCommand());
+
         // ---------------- ARM ----------------
 
         //D-PAD UP/DOWN --> Manually move arm
@@ -141,5 +152,19 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
         return Autos.moveForward(drivetrain, roller, arm);
+    }
+
+    // AUTOALIGN
+        
+    private Command rotateToTagCommand() {
+        NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
+        final var request = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity);
+
+        return Commands.run(() -> {
+        double xOffset = limelight.getEntry("tx").getDouble(0);
+        double rotationalRate = (xOffset * 3.14159265358) / 180;
+        drivetrain.setControl(request.withRotationalRate(rotationalRate));
+        }, drivetrain);
+       
     }
 }
