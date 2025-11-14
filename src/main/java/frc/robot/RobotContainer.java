@@ -92,6 +92,7 @@ public class RobotContainer {
         drivetrain.setDefaultCommand(drivetrain.getTeleopControlCommand(driverX, driverY, driverOmega, Constants.DriveConstants.TELEOP_CONTROL_CONFIG));
 
         controller.getBackButton().onTrue(rotateToTagCommand());
+        controller.getBackButton().onTrue(rangeToTagCommand());
 
         // ---------------- ARM ----------------
 
@@ -161,10 +162,35 @@ public class RobotContainer {
         final var request = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity);
 
         return Commands.run(() -> {
-        double xOffset = limelight.getEntry("tx").getDouble(0);
-        double rotationalRate = (xOffset * 3.14159265358) / 180;
-        drivetrain.setControl(request.withRotationalRate(rotationalRate));
-        }, drivetrain);
-       
+            double xOffset = limelight.getEntry("tx").getDouble(0);
+            // double rotationalRate = (-xOffset * 3.14159265358) / 180;
+        
+            double rotationalRate = Math.copySign(0.5, xOffset);
+            drivetrain.setControl(request.withRotationalRate(rotationalRate));
+        }, drivetrain).until(() -> {
+            double xOffset = limelight.getEntry("tx").getDouble(0);
+            return Math.abs(xOffset) <= 1.0;
+        })
+        .andThen(Commands.runOnce(() -> {
+            drivetrain.setControl(request.withRotationalRate(0.0));
+        }, drivetrain));
+    }
+
+    private Command rangeToTagCommand() {
+        NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
+        final var request = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity);
+
+        return Commands.run(() -> {
+            double TagArea = limelight.getEntry("ta").getDouble(0);
+
+            drivetrain.setControl(request.withVelocityX(0.5));
+
+        }, drivetrain).until(() -> {
+            double TagArea = limelight.getEntry("ta").getDouble(0);
+            return TagArea >= 1.0;
+        })
+        .andThen(Commands.runOnce(() -> {
+            drivetrain.setControl(request.withVelocityX(0.0));
+        }, drivetrain));
     }
 }
