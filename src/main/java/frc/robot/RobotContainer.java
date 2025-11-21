@@ -91,8 +91,8 @@ public class RobotContainer {
     
         drivetrain.setDefaultCommand(drivetrain.getTeleopControlCommand(driverX, driverY, driverOmega, Constants.DriveConstants.TELEOP_CONTROL_CONFIG));
 
-        controller.getBackButton().onTrue(rotateToTagCommand());
-        controller.getBackButton().onTrue(rangeToTagCommand());
+        controller.getDPad().getLeft().onTrue(rotateToTagCommand());
+        controller.getDPad().getRight().onTrue(rangeToTagCommand());
 
         // ---------------- ARM ----------------
 
@@ -179,18 +179,21 @@ public class RobotContainer {
     private Command rangeToTagCommand() {
         NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
         final var request = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity);
+        final double forwardVelocity = -0.5;
 
         return Commands.run(() -> {
-            double TagArea = limelight.getEntry("ta").getDouble(0);
+                Rotation2d heading = drivetrain.getLocalizer().getPose().getRotation();
+                double velocityX = forwardVelocity * heading.getCos();
+                double velocityY = forwardVelocity * heading.getSin();
 
-            drivetrain.setControl(request.withVelocityX(0.5));
+            drivetrain.setControl(request.withVelocityX(velocityX).withVelocityY(velocityY));
 
         }, drivetrain).until(() -> {
             double TagArea = limelight.getEntry("ta").getDouble(0);
-            return TagArea >= 1.0;
+            return TagArea >= 0.8;
         })
         .andThen(Commands.runOnce(() -> {
-            drivetrain.setControl(request.withVelocityX(0.0));
+            drivetrain.setControl(request.withVelocityX(0.0).withVelocityY(0.0));
         }, drivetrain));
     }
 }
