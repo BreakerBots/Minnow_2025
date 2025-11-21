@@ -7,7 +7,6 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
@@ -155,7 +154,7 @@ public class RobotContainer {
         return Autos.moveForward(drivetrain, roller, arm);
     }
 
-    // AUTOALIGN
+    // AUTOALIGN TO APRIL TAG
         
     private Command rotateToTagCommand() {
         NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
@@ -176,21 +175,34 @@ public class RobotContainer {
         }, drivetrain));
     }
 
+
+    // AUTODRIVE TO APRIL TAG
+
     private Command rangeToTagCommand() {
         NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
         final var request = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity);
+        
+        // We're using a negative here because we (temporarily) have the camera on the back of the robot
         final double forwardVelocity = -0.5;
 
         return Commands.run(() -> {
-                Rotation2d heading = drivetrain.getLocalizer().getPose().getRotation();
-                double velocityX = forwardVelocity * heading.getCos();
-                double velocityY = forwardVelocity * heading.getSin();
+            Rotation2d heading = drivetrain.getLocalizer().getPose().getRotation();
+            
+            // Convert robot-relative forward velocity to field-relative X and Y
+            // Since SwerveRequest.FieldCentric uses field-relative coordinates, we need to
+            // transform the robot's forward direction (0.5 m/s) into field coordinates.
+            // We use the robot's current heading (rotation) to calculate:
+            // - velocityX = forwardVelocity * cos(heading) - X component in field coordinates
+            // - velocityY = forwardVelocity * sin(heading) - Y component in field coordinates
+            // This ensures the robot moves forward in the direction it's facing, not in a fixed field direction.
+            double velocityX = forwardVelocity * heading.getCos();
+            double velocityY = forwardVelocity * heading.getSin();
 
             drivetrain.setControl(request.withVelocityX(velocityX).withVelocityY(velocityY));
 
         }, drivetrain).until(() -> {
-            double TagArea = limelight.getEntry("ta").getDouble(0);
-            return TagArea >= 0.8;
+            double tagArea = limelight.getEntry("ta").getDouble(0);
+            return tagArea >= 0.8;
         })
         .andThen(Commands.runOnce(() -> {
             drivetrain.setControl(request.withVelocityX(0.0).withVelocityY(0.0));
