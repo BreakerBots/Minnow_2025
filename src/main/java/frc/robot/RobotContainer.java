@@ -7,6 +7,7 @@ package frc.robot;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.networktables.NetworkTable;
@@ -25,7 +26,6 @@ import frc.robot.commands.Autos;
 import frc.robot.subsystems.Arm;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Roller;
-
 
 
 /**
@@ -92,6 +92,8 @@ public class RobotContainer {
 
         controller.getDPad().getLeft().onTrue(rotateToTagCommand());
         controller.getDPad().getRight().onTrue(rangeToTagCommand());
+        // TODO: Bind driveToTagCommand() to a controller button
+        // Example: controller.getButtonX().onTrue(driveToTagCommand());
 
         // ---------------- ARM ----------------
 
@@ -155,6 +157,7 @@ public class RobotContainer {
     }
 
     // AUTOALIGN TO APRIL TAG
+    // TODO: Use PID controller for smooth alignment
         
     private Command rotateToTagCommand() {
         NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
@@ -178,6 +181,88 @@ public class RobotContainer {
 
     // AUTODRIVE TO APRIL TAG
 
+    /**
+     * Drives the robot toward the closest AprilTag using PID control for smooth alignment.
+     * Controls three axes simultaneously:
+     * - Rotation: Uses tx (horizontal offset) to rotate toward the tag
+     * - Lateral: Uses tx to strafe left/right to get directly in front of the tag
+     * - Forward/Backward: Uses tag area to control distance to the tag
+     * Stops when the robot is aligned (tx ≈ 0) and at the target distance.
+     */
+    private Command driveToTagCommand() {
+        NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
+        final var request = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity);
+        
+        // Rotation PID: controls rotation based on tx (horizontal offset in degrees)
+        final PIDController rotationPID = new PIDController(0.02, 0.0, 0.001); // TODO: Tune these values
+        rotationPID.setTolerance(1.0); // degrees
+        rotationPID.enableContinuousInput(-180, 180);
+        
+        // Lateral strafe PID: controls left/right movement based on tx
+        final PIDController lateralPID = new PIDController(0.01, 0.0, 0.0005); // TODO: Tune these values
+        lateralPID.setTolerance(1.0); // degrees
+        
+        // Forward/backward PID: controls distance based on tag area
+        final double targetTagArea = 0.8; // (larger = closer)
+        final PIDController forwardPID = new PIDController(0.1, 0.0, 0.01); // TODO: Tune these values
+        forwardPID.setTolerance(0.1); 
+        
+        // Tolerance for stopping, TODO: Tune these values
+        final double alignmentTolerance = 1.0; // degrees
+        final double distanceTolerance = 0.1;
+
+        return Commands.run(() -> {
+            Rotation2d heading = drivetrain.getLocalizer().getPose().getRotation();
+            double tx = limelight.getEntry("tx").getDouble(0); // Horizontal offset (degrees)
+            double tagArea = limelight.getEntry("ta").getDouble(0); 
+            
+            // Use our x-offset to calculate rotation rate and use PID
+            double rotationalRate = rotationPID.calculate(tx, 0.0);
+
+            // Use our x-offset to calculate lateral strafe velocity and use PID
+            // The PID automatically handles the sign:
+            // - If tx is positive (tag to right), lateralVelocity will be positive
+            // - If tx is negative (tag to left), lateralVelocity will be negative
+            double lateralVelocity = lateralPID.calculate(tx, 0.0);
+            
+            // Use trig to convert lateral (perpendicular to robot heading) velocity to field coordinates
+            Rotation2d lateralDirection = heading.plus(Rotation2d.fromDegrees(90));
+            double lateralX = lateralVelocity * lateralDirection.getCos();
+            double lateralY = lateralVelocity * lateralDirection.getSin();
+            
+            // Use tag area to calculate forward velocity using PID 
+            // Negative because the camera's mounted temporarily on the back of the robot
+            double forwardVelocity = -forwardPID.calculate(tagArea, targetTagArea);
+
+            // Use trig to convert forward velocity to field coordinates
+            double forwardX = forwardVelocity * heading.getCos();
+            double forwardY = forwardVelocity * heading.getSin();
+    
+            // Move toward tag (includes both forward and lateral components), and rotate to face it
+            drivetrain.setControl(request
+                .withVelocityX(forwardX + lateralX)
+                .withVelocityY(forwardY + lateralY)
+                .withRotationalRate(rotationalRate));
+        }, drivetrain)
+        .until(() -> {
+            // Stop when both aligned AND at target distance
+            double tx = limelight.getEntry("tx").getDouble(0);
+            double tagArea = limelight.getEntry("ta").getDouble(0);
+            return Math.abs(tx) <= alignmentTolerance && 
+                   Math.abs(tagArea - targetTagArea) <= distanceTolerance;
+        })
+        .finallyDo(() -> {
+            // Reset PID controllers and stop movement
+            rotationPID.reset();
+            lateralPID.reset();
+            forwardPID.reset();
+            drivetrain.setControl(request
+                .withVelocityX(0.0)
+                .withVelocityY(0.0)
+                .withRotationalRate(0.0));
+        });
+    }
+
     private Command rangeToTagCommand() {
         NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
         final var request = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity);
@@ -188,13 +273,8 @@ public class RobotContainer {
         return Commands.run(() -> {
             Rotation2d heading = drivetrain.getLocalizer().getPose().getRotation();
             
-            // Convert robot-relative forward velocity to field-relative X and Y
-            // Since SwerveRequest.FieldCentric uses field-relative coordinates, we need to
-            // transform the robot's forward direction (0.5 m/s) into field coordinates.
-            // We use the robot's current heading (rotation) to calculate:
-            // - velocityX = forwardVelocity * cos(heading) - X component in field coordinates
-            // - velocityY = forwardVelocity * sin(heading) - Y component in field coordinates
-            // This ensures the robot moves forward in the direction it's facing, not in a fixed field direction.
+            // Convert robot-relative forward velocity to field-relative X and Y using trig
+            // since SwerveRequest.FieldCentric uses field-relative coordinates
             double velocityX = forwardVelocity * heading.getCos();
             double velocityY = forwardVelocity * heading.getSin();
 
