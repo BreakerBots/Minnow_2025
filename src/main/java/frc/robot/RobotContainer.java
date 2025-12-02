@@ -192,44 +192,70 @@ public class RobotContainer {
     private Command driveToTagCommand() {
         NetworkTable limelight = NetworkTableInstance.getDefault().getTable("limelight");
         final var request = new SwerveRequest.FieldCentric().withDriveRequestType(DriveRequestType.Velocity);
-        
-        // Rotation PID: controls rotation based on tx (horizontal offset in degrees)
-        final PIDController rotationPID = new PIDController(0.02, 0.0, 0.001); // TODO: Tune these values
-        rotationPID.setTolerance(1.0); // degrees
-        rotationPID.enableContinuousInput(-180, 180);
-        
-        // Lateral strafe PID: controls left/right movement based on tx
-        final PIDController lateralPID = new PIDController(0.01, 0.0, 0.0005); // TODO: Tune these values
-        lateralPID.setTolerance(1.0); // degrees
-        
-        // Forward/backward PID: controls distance based on tag area
-        final double targetTagArea = 0.8; // (larger = closer)
-        final PIDController forwardPID = new PIDController(0.1, 0.0, 0.01); // TODO: Tune these values
-        forwardPID.setTolerance(0.1); 
-        
-        // Tolerance for stopping, TODO: Tune these values
+    
+        // --- TOLERANCES / TARGETS: TUNE THESE ---
+
         final double alignmentTolerance = 1.0; // degrees
-        final double distanceTolerance = 0.1;
+        final double distanceTolerance = 0.1;  // meters
+        final double targetTagArea = 0.8; // (larger = closer)
+
+        // --- PID CONTROLLERS: TUNE THESE ---
+
+        // Rotation PID: controls rotation based on tx (horizontal offset in radians)
+        final PIDController rotationPID = new PIDController(1.15, 0.0, 0.06);
+        rotationPID.setTolerance(Math.toRadians(1.0));
+        
+        // Lateral strafe PID: controls left/right movement based on linear lateral offset (meters)
+        final PIDController lateralPID = new PIDController(0.5, 0.0, 0.05);
+        lateralPID.setTolerance(0.05);
+        
+        // Forward PID: controls distance based on tag area
+        final PIDController forwardPID = new PIDController(0.1, 0.0, 0.01);
+        forwardPID.setTolerance(0.1);
+
 
         return Commands.run(() -> {
-            Rotation2d heading = drivetrain.getLocalizer().getPose().getRotation();
-            double tx = limelight.getEntry("tx").getDouble(0); // Horizontal offset (degrees)
-            double tagArea = limelight.getEntry("ta").getDouble(0); 
-            
-            // Use our x-offset to calculate rotation rate and use PID
-            double rotationalRate = rotationPID.calculate(tx, 0.0);
 
-            // Use our x-offset to calculate lateral strafe velocity and use PID
-            // The PID automatically handles the sign:
-            // - If tx is positive (tag to right), lateralVelocity will be positive
-            // - If tx is negative (tag to left), lateralVelocity will be negative
-            double lateralVelocity = lateralPID.calculate(tx, 0.0);
+            // Check if tag is detected
+            double tv = limelight.getEntry("tv").getDouble(0);
+            if (tv < 1.0) {
+                System.out.println("driveToTagCommand: We lost our AprilTag: bailing out!");
+                drivetrain.setControl(request
+                    .withVelocityX(0.0)
+                    .withVelocityY(0.0)
+                    .withRotationalRate(0.0));
+                return;
+            }
+            
+            // Get our current state...
+            Rotation2d heading = drivetrain.getLocalizer().getPose().getRotation(); // Where are we facing, relative to the field?
+            Rotation2d angleToTag = Rotation2d.fromDegrees(limelight.getEntry("tx").getDouble(0));
+            double tagArea = limelight.getEntry("ta").getDouble(0); 
+            double distanceToTag = 2.0 / Math.max(tagArea, 0.1); // meters, TUNE THIS
+
+
+            // --- ROTATION ---
+
+            // Use our x-offset to calculate rotation rate and use PID
+            double rotationalRate = rotationPID.calculate(angleToTag.getRadians(), 0.0);
+
+
+            // --- STRAFE ---
+
+            // Estimate distance from tag area and convert angular offset to linear offset
+            double lateralDistance = distanceToTag * angleToTag.getTan(); // meters
+            
+            // Use strafe distance as error for lateral PID (setpoint = 0 means centered)
+            double lateralVelocity = lateralPID.calculate(lateralDistance, 0.0);
             
             // Use trig to convert lateral (perpendicular to robot heading) velocity to field coordinates
             Rotation2d lateralDirection = heading.plus(Rotation2d.fromDegrees(90));
             double lateralX = lateralVelocity * lateralDirection.getCos();
             double lateralY = lateralVelocity * lateralDirection.getSin();
             
+
+            // --- FORWARD ---
+
             // Use tag area to calculate forward velocity using PID 
             // Negative because the camera's mounted temporarily on the back of the robot
             double forwardVelocity = -forwardPID.calculate(tagArea, targetTagArea);
@@ -237,14 +263,30 @@ public class RobotContainer {
             // Use trig to convert forward velocity to field coordinates
             double forwardX = forwardVelocity * heading.getCos();
             double forwardY = forwardVelocity * heading.getSin();
-    
+
+
+            // MOVE!
+
+            double velocityX = forwardX + lateralX;
+            double velocityY = forwardY + lateralY;
+
+            System.out.println("velocityX: " + velocityX + ", velocityY: " + velocityY + ", rotationalRate: " + rotationalRate);
+            
             // Move toward tag (includes both forward and lateral components), and rotate to face it
             drivetrain.setControl(request
-                .withVelocityX(forwardX + lateralX)
-                .withVelocityY(forwardY + lateralY)
+                .withVelocityX(velocityX)
+                .withVelocityY(velocityY)
                 .withRotationalRate(rotationalRate));
+
         }, drivetrain)
-        .until(() -> {
+        .withTimeout(5.0)
+        .until(() -> { 
+            // Check if tag is still detected
+            double tv = limelight.getEntry("tv").getDouble(0);
+            if (tv < 1.0) {
+                return true; // End command if tag is lost
+            }
+            
             // Stop when both aligned AND at target distance
             double tx = limelight.getEntry("tx").getDouble(0);
             double tagArea = limelight.getEntry("ta").getDouble(0);
