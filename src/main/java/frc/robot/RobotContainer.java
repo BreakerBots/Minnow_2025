@@ -198,6 +198,7 @@ public class RobotContainer {
         final double alignmentTolerance = 1.0; // degrees
         final double distanceTolerance = 0.1;  // meters
         final double targetTagArea = 0.8; // (larger = closer)
+        final double timeoutSeconds = 5.0;
 
         // --- PID CONTROLLERS: TUNE THESE ---
 
@@ -216,10 +217,9 @@ public class RobotContainer {
 
         return Commands.run(() -> {
 
-            // Check if tag is detected
-            double tv = limelight.getEntry("tv").getDouble(0);
-            if (tv < 1.0) {
-                System.out.println("driveToTagCommand: We lost our AprilTag: bailing out!");
+            // If we lose sight of the tag, stop moving
+            double tagDetected = limelight.getEntry("tv").getDouble(0);
+            if (tagDetected < 1.0) {
                 drivetrain.setControl(request
                     .withVelocityX(0.0)
                     .withVelocityY(0.0)
@@ -233,6 +233,11 @@ public class RobotContainer {
             double tagArea = limelight.getEntry("ta").getDouble(0); 
             double distanceToTag = 2.0 / Math.max(tagArea, 0.1); // meters, TUNE THIS
 
+            System.out.println(
+                "Heading: " + heading.getDegrees() + ", " + 
+                "Angle to Tag: " + angleToTag.getDegrees() + ", " + 
+                "Tag Area: " + tagArea + ", " + 
+                "Distance to Tag: " + distanceToTag);
 
             // --- ROTATION ---
 
@@ -279,19 +284,24 @@ public class RobotContainer {
                 .withRotationalRate(rotationalRate));
 
         }, drivetrain)
-        .withTimeout(5.0)
+        .withTimeout(timeoutSeconds)
         .until(() -> { 
-            // Check if tag is still detected
+            // If we lose sight of the tag, we're done
             double tv = limelight.getEntry("tv").getDouble(0);
-            if (tv < 1.0) {
-                return true; // End command if tag is lost
+            if (tv < 1.0) {;
+                System.out.println("We lost our AprilTag: bailing out!");
+                return true; 
             }
             
-            // Stop when both aligned AND at target distance
+            // When both aligned AND at target distance, we're done
             double tx = limelight.getEntry("tx").getDouble(0);
-            double tagArea = limelight.getEntry("ta").getDouble(0);
-            return Math.abs(tx) <= alignmentTolerance && 
-                   Math.abs(tagArea - targetTagArea) <= distanceTolerance;
+            double ta = limelight.getEntry("ta").getDouble(0);
+            boolean isAligned = Math.abs(tx) <= alignmentTolerance;
+            boolean isAtTargetDistance = Math.abs(ta - targetTagArea) <= distanceTolerance;
+            System.out.println(
+                "angleToTag: " + tx + "(isAligned? " + isAligned + "), " +
+                "tagArea: " + ta + "(isAtTargetDistance? " + isAtTargetDistance + ")");
+            return (isAligned && isAtTargetDistance);
         })
         .finallyDo(() -> {
             // Reset PID controllers and stop movement
